@@ -10,6 +10,9 @@ Why is it better:
 * Words forms are easier accessible.
 * History and bookmarks.
 * Dark mode.
+* No tracking.
+
+The app is not authorized by EKI, it's an independent work.
 
 ## Author and License
 
