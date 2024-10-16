@@ -1,0 +1,72 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:sonamobi/providers/fetcher.dart';
+import 'package:sonamobi/providers/html_frame.dart';
+import 'package:sonamobi/providers/links.dart';
+import 'package:webview_flutter/webview_flutter.dart';
+
+class WordFormsPage extends ConsumerStatefulWidget {
+  final int formId;
+  final String language;
+
+  const WordFormsPage({super.key, required this.formId, this.language = 'est'});
+
+  @override
+  ConsumerState<WordFormsPage> createState() => _WordFormsPageState();
+}
+
+class _WordFormsPageState extends ConsumerState<WordFormsPage> {
+  final WebViewController _webController = WebViewController();
+
+  @override
+  void initState() {
+    super.initState();
+    _webController.setJavaScriptMode(JavaScriptMode.disabled);
+    _webController.setNavigationDelegate(NavigationDelegate(
+      onNavigationRequest: (_) => NavigationDecision.prevent,
+    ));
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _webController.setBackgroundColor(Theme.of(context).canvasColor);
+    });
+    _loadPage();
+  }
+
+  _loadPage() async {
+    try {
+      final body = await ref.read(pageProvider).fetchPage(ref
+          .read(linksProvider.notifier)
+          .morpho(widget.formId, widget.language));
+
+      String content = ref.read(htmlFrameProvider).frame(body, context);
+      _webController.loadHtmlString(content);
+    } on FetchError catch (e) {
+      // TODO
+      print(e.toString());
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: SafeArea(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Expanded(child: WebViewWidget(controller: _webController)),
+            TextButton.icon(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              style: TextButton.styleFrom(textStyle: TextStyle(fontSize: 20)),
+              label: Text('Sulge'),
+              icon: Icon(
+                Icons.close,
+                color: Colors.redAccent,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
