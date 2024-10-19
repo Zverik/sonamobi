@@ -203,10 +203,7 @@ class _WordViewState extends ConsumerState<WordView> {
 
         // The rest of the page.
         Expanded(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8.0),
-            child: WebViewWidget(controller: _webController),
-          ),
+          child: WebViewWidget(controller: _webController),
         ),
       ],
     );

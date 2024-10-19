@@ -39,6 +39,11 @@ class NightModeNotifier extends StateNotifier<ThemeMode> {
     await prefs.setInt(_kPrefsKey, value);
   }
 
+  set(ThemeMode mode) {
+    state = mode;
+    _save();
+  }
+
   next() {
     switch (state) {
       case ThemeMode.system:

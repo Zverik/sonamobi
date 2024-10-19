@@ -9,20 +9,17 @@ final historyProvider = ChangeNotifierProvider((ref) => HistoryController(ref));
 
 class HistoryController extends ChangeNotifier {
   final Ref _ref;
+  List<HistoryEntry> history = const [];
+  List<HistoryEntry> starred = const [];
 
   HistoryController(this._ref) {
     _load();
   }
 
   _load() async {
-    final db = await _ref.read(databaseProvider).database;
-    final rows = await db.query(
-      HistoryEntry.kTableName,
-      orderBy: 'accessed desc',
-      limit: 100,
-    );
-    final lastHistory = rows.map((row) => HistoryEntry.fromJson(row)).toList();
-    // TODO
+    history = await fetchHistory();
+    starred = await fetchStarred();
+    notifyListeners();
   }
 
   Future<List<HistoryEntry>> fetchHistory([int limit = 100]) async {
@@ -44,7 +41,7 @@ class HistoryController extends ChangeNotifier {
     return rows.map((row) => HistoryEntry.fromJson(row)).toList();
   }
 
-  Future addView(WordRef word) async {
+  Future addView(WordRef word, bool simple) async {
     final entry = HistoryEntry(word);
     final db = await _ref.read(databaseProvider).database;
     final rows = await db.query(
@@ -55,11 +52,16 @@ class HistoryController extends ChangeNotifier {
     final dbEntry =
         rows.map((row) => HistoryEntry.fromJson(row)).firstOrNull ?? entry;
     dbEntry.views += 1;
+    dbEntry.lastAccessed = DateTime.now();
     await db.insert(
       HistoryEntry.kTableName,
       dbEntry.toJson(),
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
+    
+    // Update the cached history.
+    history = await fetchHistory();
+    notifyListeners();
   }
 
   Future star(WordRef word, bool starred) async {
@@ -78,5 +80,8 @@ class HistoryController extends ChangeNotifier {
       dbEntry.toJson(),
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
+
+    // Update the cached history and starred.
+    await _load();
   }
 }

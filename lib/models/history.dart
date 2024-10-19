@@ -17,7 +17,7 @@ class HistoryEntry {
 
   static const kTableName = 'history';
   static const kTableFields = [
-    'word text',
+    'word text primary key',
     'accessed integer',
     'views integer',
     'starred integer',

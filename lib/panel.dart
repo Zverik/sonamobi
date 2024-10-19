@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logging/logging.dart';
 import 'package:sonamobi/autocomplete.dart';
 import 'package:sonamobi/models/wordref.dart';
+import 'package:sonamobi/providers/history.dart';
 import 'package:sonamobi/util/debouncer.dart';
 import 'package:sonamobi/empty.dart';
 import 'package:sonamobi/providers/fetcher.dart';
@@ -19,9 +20,10 @@ class WordPage extends ConsumerStatefulWidget {
   ConsumerState<WordPage> createState() => _WordPageState();
 }
 
-class _WordPageState extends ConsumerState<WordPage> {
+class _WordPageState extends ConsumerState<WordPage>
+    with WidgetsBindingObserver {
   static final _logger = Logger('WordPage');
-  
+
   bool _searching = true;
   final DebounceDelayer debouncer = DebounceDelayer();
   AutocompleteResults? found;
@@ -33,6 +35,31 @@ class _WordPageState extends ConsumerState<WordPage> {
   initState() {
     super.initState();
     _searching = widget.word == null;
+    if (widget.word != null) {
+      ref.read(historyProvider).addView(widget.word!, ref.read(linksProvider));
+    }
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed && mounted) {
+      print('State: $state');
+      Future.delayed(Duration(milliseconds: 200), () async {
+        if (!mounted) return;
+        if (_searchFocus.hasFocus) {
+          _searchFocus.unfocus();
+          Future.delayed(Duration(milliseconds: 1));
+        }
+        _searchFocus.requestFocus();
+      });
+    }
   }
 
   _autocomplete(String value) async {
@@ -85,7 +112,7 @@ class _WordPageState extends ConsumerState<WordPage> {
     Widget page;
     if (!_searching && widget.word != null) {
       page = WordView(widget.word!);
-    } else if (found?.isEmpty ?? true) {
+    } else if (found == null) {
       page = const EmptyWordView();
     } else {
       page = AutocompleteView(
