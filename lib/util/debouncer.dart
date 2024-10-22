@@ -3,7 +3,7 @@ import 'dart:async';
 class DebounceDelayer {
   Timer? _timer;
 
-  DebounceDelayer() {}
+  DebounceDelayer();
 
   void delayed(Duration duration, Function() computation) {
     if (_timer?.isActive ?? false) _timer?.cancel();

@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 class CachedPage {
@@ -11,7 +12,7 @@ class CachedPage {
   static const kTableName = 'cache';
   static const kTableFields = [
     'url text',
-    'content text',
+    'content blob',
     'requested integer',
   ];
 
@@ -19,7 +20,7 @@ class CachedPage {
     final codec = GZipCodec();
     return {
       'url': url,
-      'content': content,
+      'content': codec.encode(utf8.encode(content)),
       'requested': requestedAt.millisecondsSinceEpoch,
     };
   }
@@ -28,7 +29,7 @@ class CachedPage {
     final codec = GZipCodec();
     return CachedPage(
       data['url'],
-      data['content'],
+      utf8.decode(codec.decode(data['content'])),
       DateTime.fromMillisecondsSinceEpoch(data['requested']),
     );
   }

@@ -80,3 +80,14 @@ IconData nightModeIcon(ThemeMode mode) {
       return Icons.dark_mode;
   }
 }
+
+Color nightModeColor(ThemeMode mode) {
+  switch (mode) {
+    case ThemeMode.system:
+      return Colors.grey;
+    case ThemeMode.light:
+      return Colors.yellow.shade800;
+    case ThemeMode.dark:
+      return Colors.blue;
+  }
+}

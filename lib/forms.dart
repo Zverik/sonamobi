@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:logging/logging.dart';
 import 'package:sonamobi/providers/fetcher.dart';
 import 'package:sonamobi/providers/html_frame.dart';
 import 'package:sonamobi/providers/links.dart';
@@ -16,6 +17,7 @@ class WordFormsPage extends ConsumerStatefulWidget {
 }
 
 class _WordFormsPageState extends ConsumerState<WordFormsPage> {
+  static final _logger = Logger('WordFormsPage');
   final WebViewController _webController = WebViewController();
 
   @override
@@ -37,11 +39,12 @@ class _WordFormsPageState extends ConsumerState<WordFormsPage> {
           .read(linksProvider.notifier)
           .morpho(widget.formId, widget.language));
 
-      String content = ref.read(htmlFrameProvider).frame(body, context);
-      _webController.loadHtmlString(content);
+      if (mounted) {
+        String content = ref.read(htmlFrameProvider).frame(body, context);
+        _webController.loadHtmlString(content);
+      }
     } on FetchError catch (e) {
-      // TODO
-      print(e.toString());
+      _logger.severe('Failed to load word forms', e);
     }
   }
 

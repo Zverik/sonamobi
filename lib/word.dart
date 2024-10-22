@@ -24,6 +24,7 @@ class _WordViewState extends ConsumerState<WordView> {
   static final _logger = Logger('WordView');
 
   bool _loading = true;
+  String? _error;
   List<Homonym> _homonyms = const [];
   SearchPageData _pageData = SearchPageData.empty;
   int _chosenHomonym = 0;
@@ -53,6 +54,7 @@ class _WordViewState extends ConsumerState<WordView> {
   }
 
   _changeHomonym(int idx) async {
+    _error = null;
     _chosenHomonym = idx;
     String content;
     try {
@@ -60,8 +62,10 @@ class _WordViewState extends ConsumerState<WordView> {
           .read(linksProvider.notifier)
           .wordDetails(_homonyms[_chosenHomonym].id));
     } on FetchError catch (e) {
-      // TODO
       _logger.severe('Failed to request homonyms', e);
+      setState(() {
+        _error = 'Failed to request homonyms.';
+      });
       return;
     }
     _pageData = SonaveebParsers.parseSearchPage(content);
@@ -77,6 +81,7 @@ class _WordViewState extends ConsumerState<WordView> {
   }
 
   _updateMainPage() async {
+    _error = null;
     _homonyms = const [];
     try {
       final body = await ref
@@ -84,14 +89,14 @@ class _WordViewState extends ConsumerState<WordView> {
           .fetchPage(ref.read(linksProvider.notifier).search(widget.word.word));
       _homonyms = SonaveebParsers.extractHomonyms(body);
     } on FetchError catch (e) {
-      // TODO
-      print(e.toString());
+      _logger.severe('Failed to fetch the word page', e);
+      setState(() {
+        _error = 'Failed to fetch the word page.';
+      });
       return;
     }
 
     if (_homonyms.isEmpty) {
-      // TODO
-      print('No homonyms!');
       return;
     }
 
@@ -108,13 +113,32 @@ class _WordViewState extends ConsumerState<WordView> {
     await _changeHomonym(homonym);
   }
 
+  Widget _messageWidget(String message, [bool red = false]) {
+    return Center(
+      child: Text(
+        message,
+        style: TextStyle(
+          fontSize: 20,
+          color: red ? Colors.red : null,
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    if (_loading) return Text('loading...');
+    if (_loading) {
+      return _messageWidget('Laen alla...');
+    }
+
+    if (_error != null) {
+      return _messageWidget(_error ?? 'viga', true);
+    }
+
     final homonym = _homonyms.isEmpty ? null : _homonyms[_chosenHomonym];
 
     if (homonym == null) {
-      return Center(child: Text('No homonyms'));
+      return _messageWidget('Pole homonüüme');
     }
 
     return Column(
@@ -124,7 +148,8 @@ class _WordViewState extends ConsumerState<WordView> {
         SingleChildScrollView(
           scrollDirection: Axis.horizontal,
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+            padding:
+                const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.center,

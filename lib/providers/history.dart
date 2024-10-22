@@ -42,7 +42,7 @@ class HistoryController extends ChangeNotifier {
   }
 
   Future addView(WordRef word, bool simple) async {
-    final entry = HistoryEntry(word);
+    final entry = HistoryEntry(word.word);
     final db = await _ref.read(databaseProvider).database;
     final rows = await db.query(
       HistoryEntry.kTableName,
@@ -65,7 +65,7 @@ class HistoryController extends ChangeNotifier {
   }
 
   Future star(WordRef word, bool starred) async {
-    final entry = HistoryEntry(word);
+    final entry = HistoryEntry(word.word);
     final db = await _ref.read(databaseProvider).database;
     final rows = await db.query(
       HistoryEntry.kTableName,

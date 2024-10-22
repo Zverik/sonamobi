@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logging/logging.dart';
-import 'package:sonamobi/focus_test.dart';
 import 'package:sonamobi/providers/night.dart';
 import 'package:sonamobi/panel.dart';
 import 'package:sonamobi/util/log_store.dart';

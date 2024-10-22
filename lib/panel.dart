@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logging/logging.dart';
 import 'package:sonamobi/autocomplete.dart';
+import 'package:sonamobi/log.dart';
 import 'package:sonamobi/models/wordref.dart';
 import 'package:sonamobi/providers/history.dart';
 import 'package:sonamobi/util/debouncer.dart';
@@ -50,7 +51,6 @@ class _WordPageState extends ConsumerState<WordPage>
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed && mounted) {
-      print('State: $state');
       Future.delayed(Duration(milliseconds: 200), () async {
         if (!mounted) return;
         if (_searchFocus.hasFocus) {
@@ -64,7 +64,7 @@ class _WordPageState extends ConsumerState<WordPage>
 
   _autocomplete(String value) async {
     setState(() {
-      found = null;
+      found = value.length < 2 ? null : AutocompleteResults.empty;
     });
     if (value.length < 2) return;
 
@@ -105,6 +105,16 @@ class _WordPageState extends ConsumerState<WordPage>
         _searching = false;
       });
     }
+  }
+
+  bool _checkSystem(String value) {
+    if (value.replaceAll(' ', '') == '?log') {
+      Navigator.of(context).push(MaterialPageRoute(
+        builder: (_) => LogDisplayPage(),
+      ));
+      return true;
+    }
+    return false;
   }
 
   @override
@@ -159,24 +169,30 @@ class _WordPageState extends ConsumerState<WordPage>
                         fillColor: Colors.white,
                       ),
                       onChanged: (value) {
+                        value = value.trim();
+                        if (_checkSystem(value)) {
+                          _searchController.clear();
+                          return;
+                        }
                         setState(() {
                           _searching = value.isNotEmpty;
                         });
-                        if (value.trim().length >= 2) {
-                          debouncer.delayed(const Duration(milliseconds: 500),
-                              () {
-                            _autocomplete(value.trim());
-                          });
-                        }
+                        debouncer.delayed(
+                          const Duration(milliseconds: 500),
+                          () {
+                            _autocomplete(value);
+                          },
+                        );
                       },
                       onSubmitted: (value) async {
-                        if (value.trim().isNotEmpty) {
+                        value = value.trim();
+                        if (value.isNotEmpty) {
                           debouncer.cancel();
-                          await _autocomplete(value.trim());
+                          await _autocomplete(value);
                           if (found?.found.isNotEmpty ?? false) {
                             // If the first result is exactly what's typed, go to the page.
                             final firstWord = found?.found.first ?? '';
-                            if (firstWord == _searchController.text.trim()) {
+                            if (firstWord == value) {
                               _openWord(firstWord);
                             }
                           }

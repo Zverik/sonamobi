@@ -1,7 +1,7 @@
 import 'package:sonamobi/models/wordref.dart';
 
 class HistoryEntry {
-  final WordRef word;
+  final String word;
   DateTime lastAccessed;
   int views;
   bool starred;
@@ -13,7 +13,8 @@ class HistoryEntry {
     this.starred = false,
   }) : lastAccessed = accessed ?? DateTime.now();
 
-  String get databaseId => word.toUrl();
+  String get databaseId => word;
+  WordRef get wordRef => WordRef(word);
 
   static const kTableName = 'history';
   static const kTableFields = [
@@ -25,7 +26,7 @@ class HistoryEntry {
 
   Map<String, dynamic> toJson() {
     return {
-      'word': word.toUrl(),
+      'word': word,
       'accessed': lastAccessed.millisecondsSinceEpoch,
       'views': views,
       'starred': starred ? 1 : 0,
@@ -34,7 +35,7 @@ class HistoryEntry {
 
   factory HistoryEntry.fromJson(Map<String, dynamic> data) {
     return HistoryEntry(
-      WordRef.fromUrl(data['word']),
+      data['word'],
       accessed: DateTime.fromMillisecondsSinceEpoch(data['accessed']),
       views: data['views'],
       starred: data['starred'] == 1,

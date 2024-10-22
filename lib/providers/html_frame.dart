@@ -286,6 +286,7 @@ button { background-color: %background%; color: %text%; }
 ''';
 
 const kColorsLight = {
+  'a': '#2962FF',
   'gray350': '#687887',
   'lightgray': '#ccd9e0',
   'lang': '#ecf0f2',

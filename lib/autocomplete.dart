@@ -11,6 +11,8 @@ class AutocompleteResults {
   final List<String> found;
   final List<String> forms;
 
+  static const empty = AutocompleteResults(found: [], forms: []);
+
   const AutocompleteResults({required this.found, required this.forms});
 
   bool get isEmpty => found.isEmpty && forms.isEmpty;
@@ -31,7 +33,6 @@ class AutocompleteView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListView.separated(
-      // TODO: scroll from bottom
       reverse: true,
       itemCount: found.length(),
       itemBuilder: (context, index) {

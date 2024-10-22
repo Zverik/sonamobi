@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:typed_data';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
@@ -33,7 +32,7 @@ class PageProvider {
   static final _logger = Logger('PageProvider');
 
   String? _cookie;
-  Ref _ref;
+  final Ref _ref;
 
   PageProvider(this._ref);
 
