@@ -11,14 +11,20 @@ class HtmlFrameProvider {
 
   HtmlFrameProvider(this._ref);
 
-  String frame(String content, [BuildContext? context]) {
+  String frame({required String id, required String content, String? forms, BuildContext? context}) {
     final head = [
       '<title>page</title>',
       '<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">',
       '<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">',
       '<style>${buildCss(context)}</style>',
     ];
-    return '<html lang="en"><head>${head.join()}</head><body>$content</body></html>';
+    String formsHtml;
+    if (forms == null) {
+      formsHtml = '';
+    } else {
+      formsHtml = '<div id="forms-box"><a href="https://word.forms/"><table><tr><td>$forms</td><td id="forms-box-arrow">&#10749;</td></tr></table></a></div>';
+    }
+    return '<html lang="en"><head>${head.join()}</head><body>$formsHtml<div id="$id">$content</div></body></html>';
   }
 
   String buildCss(BuildContext? context) {
@@ -58,8 +64,14 @@ extension HexColor on Color {
 }
 
 const kCssCommon = '''
-body { font-size: 20px; background-color: %background%; color: %text%; }
+body {
+  font-size: 20px;
+  background-color: %background%;
+  color: %text%;
+  margin: 0;
+}
 a { color: %a%; }
+div.word-details { margin: 8px; }
 div.content-title { display: none !important; }
 .level-2-panel h5.meaning-sub-heading:first-child { display: none !important; }
 .btn-speaker { display: none !important; }
@@ -70,6 +82,23 @@ div.content-title { display: none !important; }
 /* another "näita vähem" button */
 .colloc-inner-section .btn-link-muted { display: none !important; }
 .definition-sources { display: none !important; }
+
+#forms-box {
+  background-color: %lightgray%;
+  margin: 0;
+  padding: 4px 8px;
+}
+#forms-box td {
+  padding-right: 24px;
+  font-size: 20px;
+}
+#forms-box > a > table { width: 100%; }
+#forms-box eki-form { color: %text%; }
+#forms-box #forms-box-arrow { text-alight: right; padding: 0; margin: 0; }
+
+#wordforms .modal-header { display: none !important; }
+#wordforms ul.nav { display: none !important; }
+#wordforms .paradigm-text { display: none !important; }
 
 .collapse:not(.show) { display: none; }
 
@@ -181,6 +210,7 @@ eki-stress::after {
 
 .list-unstyled { padding-left: 0; list-style: none; }
 ol, ul, dl { margin-top: 0; margin-bottom: 1rem; }
+b, strong { font-weight: bolder; }
 
 .d-flex { display: flex !important; }
 .flex-column { flex-direction: column !important; }
@@ -283,6 +313,55 @@ ol, ul, dl { margin-top: 0; margin-bottom: 1rem; }
   text-decoration: none;
 }
 button { background-color: %background%; color: %text%; }
+
+#wordforms .modal-body {
+  padding: 16px 25px;
+}
+#wordforms .uppercase {
+  text-transform: uppercase;
+  margin-bottom: -10px;
+}
+#wordforms h2 {
+  margin: 26px 0 12px;
+  font-size: 18px;
+  font-weight: normal;
+  text-transform: uppercase;
+}
+#wordforms .scrollable-table {
+  position: relative;
+  margin-left: -10px;
+  margin-right: -10px;
+}
+#wordforms table th, #wordforms table td {
+  padding: 10px 12px;
+  border-bottom: 1px solid #ecf0f2;
+}
+th { text-align: inherit; }
+#wordforms table th {
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 120%;
+}
+#wordforms table td {
+  padding-top: 5px;
+  padding-bottom: 5px;
+}
+.morphology-paradigm table td {
+  line-height: 1.4;
+  min-width: 30%;
+  max-width: 60%;
+  white-space: normal;
+}
+#wordforms table th[colspan="3"] {
+  border: none;
+  font-size: 18px;
+  line-height: 22px;
+  font-weight: normal;
+}
+#wordforms .subtitle {
+  padding-top: 20px;
+  padding-bottom: 0;
+}
 ''';
 
 const kColorsLight = {

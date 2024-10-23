@@ -1,5 +1,5 @@
 import 'package:html/parser.dart' show parse;
-import 'package:html/dom.dart' show Document;
+import 'package:html/dom.dart' show Element;
 
 class Homonym {
   final int id;
@@ -28,11 +28,13 @@ class WordForm {
 
 class SearchPageData {
   final List<WordForm> forms;
+  final String formsRaw;
   final int? morphId;
 
-  const SearchPageData({required this.forms, this.morphId});
+  const SearchPageData(
+      {required this.forms, required this.formsRaw, this.morphId});
 
-  static const empty = SearchPageData(forms: []);
+  static const empty = SearchPageData(forms: [], formsRaw: '');
 }
 
 class SonaveebParsers {
@@ -89,33 +91,37 @@ class SonaveebParsers {
     return homonyms;
   }
 
-  static List<WordForm> extractWordForms(Document document) {
+  static List<WordForm> extractWordForms(Element table) {
     final reHtmlTag = RegExp(r'<[^>]+>');
     final List<WordForm> result = [];
-    final morph = document.getElementsByClassName('morphology-paradigm');
-    if (morph.isNotEmpty) {
-      final table = morph.first.getElementsByTagName('table');
-      for (final td in table.first.getElementsByTagName('td')) {
-        final spans = td.getElementsByTagName('span');
-        if (spans.isEmpty) continue;
-        final title = spans.first.attributes['title'] ?? '???';
-        final word = spans.first.innerHtml.replaceAll(reHtmlTag, '');
+    for (final td in table.getElementsByTagName('td')) {
+      final spans = td.getElementsByTagName('span');
+      if (spans.isEmpty) continue;
+      final title = spans.first.attributes['title'] ?? '???';
+      final word = spans.first.innerHtml.replaceAll(reHtmlTag, '');
 
-        String? spoken;
-        final btn = td.getElementsByTagName('button');
-        if (btn.isNotEmpty) {
-          spoken = btn.first.attributes['data-url-to-audio'];
-        }
-
-        result.add(WordForm(word: word, title: title, spoken: spoken));
+      String? spoken;
+      final btn = td.getElementsByTagName('button');
+      if (btn.isNotEmpty) {
+        spoken = btn.first.attributes['data-url-to-audio'];
       }
+
+      result.add(WordForm(word: word, title: title, spoken: spoken));
     }
     return result;
   }
 
   static SearchPageData parseSearchPage(String body) {
     final document = parse(body);
-    final forms = extractWordForms(document);
+
+    final morph = document.getElementsByClassName('morphology-paradigm');
+    List<WordForm> forms = [];
+    String formsRaw = '';
+    if (morph.isNotEmpty) {
+      final table = morph.first.getElementsByTagName('table');
+      forms = extractWordForms(table.first);
+      formsRaw = table.first.outerHtml;
+    }
 
     final paradigm = document.getElementById('morpho-modal-0');
     int? paradigmId;
@@ -126,6 +132,7 @@ class SonaveebParsers {
 
     return SearchPageData(
       forms: forms,
+      formsRaw: formsRaw,
       morphId: paradigmId,
     );
   }

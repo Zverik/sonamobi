@@ -40,7 +40,9 @@ class _WordFormsPageState extends ConsumerState<WordFormsPage> {
           .morpho(widget.formId, widget.language));
 
       if (mounted) {
-        String content = ref.read(htmlFrameProvider).frame(body, context);
+        String content = ref
+            .read(htmlFrameProvider)
+            .frame(id: 'wordforms', content: body, context: context);
         _webController.loadHtmlString(content);
       }
     } on FetchError catch (e) {

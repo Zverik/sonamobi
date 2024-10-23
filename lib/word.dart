@@ -41,16 +41,23 @@ class _WordViewState extends ConsumerState<WordView> {
     final kReWord = ref.read(linksProvider.notifier).searchRegExp;
     _webController.setJavaScriptMode(JavaScriptMode.disabled);
     _webController.setNavigationDelegate(
-        NavigationDelegate(onNavigationRequest: (request) {
-      final match = kReWord.matchAsPrefix(request.url);
-      if (match != null && match.groupCount > 0) {
-        final word = Uri.decodeComponent(match.group(1) ?? '');
-        Navigator.of(context).push(MaterialPageRoute(
-          builder: (_) => WordPage(word: WordRef.fromUrl(word)),
-        ));
-      }
-      return NavigationDecision.prevent;
-    }));
+      NavigationDelegate(onNavigationRequest: (request) {
+        _logger.info('Tapped: ${request.url}');
+        if (request.url == 'https://word.forms/' && _pageData.morphId != null) {
+          Navigator.of(context).push(MaterialPageRoute(
+            builder: (_) => WordFormsPage(formId: _pageData.morphId ?? 1314487),
+          ));
+        }
+        final match = kReWord.matchAsPrefix(request.url);
+        if (match != null && match.groupCount > 0) {
+          final word = Uri.decodeComponent(match.group(1) ?? '');
+          Navigator.of(context).push(MaterialPageRoute(
+            builder: (_) => WordPage(word: WordRef.fromUrl(word)),
+          ));
+        }
+        return NavigationDecision.prevent;
+      }),
+    );
   }
 
   _changeHomonym(int idx) async {
@@ -72,7 +79,11 @@ class _WordViewState extends ConsumerState<WordView> {
 
     if (!mounted) return;
     await _webController.loadHtmlString(
-      ref.read(htmlFrameProvider).frame(content, context),
+      ref.read(htmlFrameProvider).frame(
+          id: 'wordpage',
+          content: content,
+          forms: _pageData.formsRaw,
+          context: context),
       baseUrl: 'https://sonaveeb.ee/',
     );
     setState(() {
@@ -183,50 +194,6 @@ class _WordViewState extends ConsumerState<WordView> {
           ),
         ),
 
-        // Word forms.
-        if (_pageData.forms.isNotEmpty)
-          GestureDetector(
-            onTap: _pageData.morphId == null
-                ? null
-                : () {
-                    Navigator.of(context).push(MaterialPageRoute(
-                      builder: (_) =>
-                          WordFormsPage(formId: _pageData.morphId ?? 1314487),
-                    ));
-                  },
-            child: Container(
-              color: Theme.of(context).highlightColor,
-              padding: EdgeInsets.symmetric(vertical: 4.0),
-              child: Row(
-                children: [
-                  for (int i = 0; i < 2; i++)
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          for (int j = 0; j < _pageData.forms.length / 2; j++)
-                            if (j * 2 + i < _pageData.forms.length)
-                              Text(
-                                _pageData.forms[j * 2 + i].word,
-                                style: TextStyle(fontSize: 20),
-                              ),
-                        ],
-                      ),
-                    ),
-                  Spacer(),
-                  Padding(
-                    padding: const EdgeInsets.only(right: 8.0),
-                    child: Center(
-                      child: Icon(Icons.navigate_next),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-
-        // The rest of the page.
         Expanded(
           child: WebViewWidget(controller: _webController),
         ),
