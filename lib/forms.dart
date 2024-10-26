@@ -28,9 +28,11 @@ class _WordFormsPageState extends ConsumerState<WordFormsPage> {
     _webController.setNavigationDelegate(
       NavigationDelegate(onNavigationRequest: (request) {
         _logger.info('Tapped: "${request.url}"');
-if (request.url.toString() == kBaseUrl) return NavigationDecision.navigate;
-_logger.info('Prevented navigation.');
-return NavigationDecision.prevent;
+        if (request.url.toString() == kBaseUrl) {
+          return NavigationDecision.navigate;
+        }
+        _logger.info('Prevented navigation.');
+        return NavigationDecision.prevent;
       }),
     );
     WidgetsBinding.instance.addPostFrameCallback((_) {

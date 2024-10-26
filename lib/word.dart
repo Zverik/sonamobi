@@ -56,9 +56,11 @@ class _WordViewState extends ConsumerState<WordView> {
             builder: (_) => WordPage(word: WordRef.fromUrl(word)),
           ));
         }
-if (request.url.toString() == kBaseUrl) return NavigationDecision.navigate;
-_logger.info('Prevented navigation.');
-return NavigationDecision.prevent;
+        if (request.url.toString() == kBaseUrl) {
+          return NavigationDecision.navigate;
+        }
+        _logger.info('Prevented navigation.');
+        return NavigationDecision.prevent;
       }),
     );
   }
