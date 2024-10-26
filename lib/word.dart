@@ -22,6 +22,7 @@ class WordView extends ConsumerStatefulWidget {
 
 class _WordViewState extends ConsumerState<WordView> {
   static final _logger = Logger('WordView');
+  static const kBaseUrl = 'https://sonaveeb.ee/';
 
   bool _loading = true;
   String? _error;
@@ -42,7 +43,7 @@ class _WordViewState extends ConsumerState<WordView> {
     _webController.setJavaScriptMode(JavaScriptMode.disabled);
     _webController.setNavigationDelegate(
       NavigationDelegate(onNavigationRequest: (request) {
-        _logger.info('Tapped: ${request.url}');
+        _logger.info('Tapped: "${request.url}"');
         if (request.url == 'https://word.forms/' && _pageData.morphId != null) {
           Navigator.of(context).push(MaterialPageRoute(
             builder: (_) => WordFormsPage(formId: _pageData.morphId ?? 1314487),
@@ -55,7 +56,9 @@ class _WordViewState extends ConsumerState<WordView> {
             builder: (_) => WordPage(word: WordRef.fromUrl(word)),
           ));
         }
-        return NavigationDecision.prevent;
+if (request.url.toString() == kBaseUrl) return NavigationDecision.navigate;
+_logger.info('Prevented navigation.');
+return NavigationDecision.prevent;
       }),
     );
   }
@@ -84,7 +87,7 @@ class _WordViewState extends ConsumerState<WordView> {
           content: content,
           forms: _pageData.formsRaw,
           context: context),
-      baseUrl: 'https://sonaveeb.ee/',
+      baseUrl: kBaseUrl,
     );
     setState(() {
       _loading = false;

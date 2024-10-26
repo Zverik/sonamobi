@@ -18,15 +18,21 @@ class WordFormsPage extends ConsumerStatefulWidget {
 
 class _WordFormsPageState extends ConsumerState<WordFormsPage> {
   static final _logger = Logger('WordFormsPage');
+  static const kBaseUrl = 'https://sonaveeb.ee/';
   final WebViewController _webController = WebViewController();
 
   @override
   void initState() {
     super.initState();
     _webController.setJavaScriptMode(JavaScriptMode.disabled);
-    _webController.setNavigationDelegate(NavigationDelegate(
-      onNavigationRequest: (_) => NavigationDecision.prevent,
-    ));
+    _webController.setNavigationDelegate(
+      NavigationDelegate(onNavigationRequest: (request) {
+        _logger.info('Tapped: "${request.url}"');
+if (request.url.toString() == kBaseUrl) return NavigationDecision.navigate;
+_logger.info('Prevented navigation.');
+return NavigationDecision.prevent;
+      }),
+    );
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _webController.setBackgroundColor(Theme.of(context).canvasColor);
     });
@@ -43,7 +49,7 @@ class _WordFormsPageState extends ConsumerState<WordFormsPage> {
         String content = ref
             .read(htmlFrameProvider)
             .frame(id: 'wordforms', content: body, context: context);
-        _webController.loadHtmlString(content);
+        _webController.loadHtmlString(content, baseUrl: kBaseUrl);
       }
     } on FetchError catch (e) {
       _logger.severe('Failed to load word forms', e);

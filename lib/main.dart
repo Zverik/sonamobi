@@ -31,13 +31,13 @@ class SonamobiApp extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return MaterialApp(
       title: 'Sõnamobi',
+      // debugShowCheckedModeBanner: false,
       themeMode: ref.watch(nightModeProvider),
       darkTheme: ThemeData.dark(),
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
       home: const WordPage(),
-      // home: const TestFocusPage(),
     );
   }
 }

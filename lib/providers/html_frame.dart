@@ -69,6 +69,10 @@ body {
   background-color: %background%;
   color: %text%;
   margin: 0;
+  font-family: "Inter", -apple-system, blinkmacsystemfont, "Segoe UI", roboto, "Helvetica Neue", arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  font-weight: 400;
+  line-height: 1.5;
+  text-align: left;
 }
 a { color: %a%; }
 div.word-details { margin: 8px; }
