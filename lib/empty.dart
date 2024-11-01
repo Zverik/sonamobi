@@ -17,6 +17,7 @@ class EmptyWordView extends ConsumerWidget {
     final history = ref.watch(historyProvider);
     final isDark = ref.read(nightModeProvider.notifier).isDark(context);
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         SizedBox(height: 10.0),
         ListTile(
@@ -39,11 +40,28 @@ class EmptyWordView extends ConsumerWidget {
         ),
         SwitchListTile(
           value: ref.watch(linksProvider),
-          title: Text('Keeleõppijale'),
+          title: Text('Keeleõppija sõnavara'),
           onChanged: (value) {
             ref.read(linksProvider.notifier).toggle();
           },
         ),
+        if (history.history.length > 3)
+          GestureDetector(
+            child: Container(
+              padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 5.0),
+              color: isDark ? Colors.blue.shade900 : Colors.blue.shade100,
+              child: Text(
+                'Ava sõnaveebi veebileht',
+                style: TextStyle(
+                  color: isDark ? Colors.blue.shade100 : Colors.blue.shade900,
+                  fontSize: 18,
+                ),
+              ),
+            ),
+            onTap: () {
+              launchUrl(Uri.https('sonaveeb.ee'));
+            },
+          ),
         if (history.history.length <= 3)
           Padding(
             padding: const EdgeInsets.all(16.0),

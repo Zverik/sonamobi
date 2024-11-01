@@ -55,6 +55,8 @@ class _WordFormsPageState extends ConsumerState<WordFormsPage> {
       }
     } on FetchError catch (e) {
       _logger.severe('Failed to load word forms', e);
+      _webController.loadHtmlString('Failed to load word forms',
+          baseUrl: kBaseUrl);
     }
   }
 

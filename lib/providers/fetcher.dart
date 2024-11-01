@@ -12,17 +12,18 @@ final pageProvider = Provider((ref) => PageProvider(ref));
 
 class FetchError implements Exception {
   final String message;
+  final String path;
   final int code;
   final String body;
   final String? url;
 
-  FetchError(this.message, http.Response? response)
+  FetchError(this.message, this.path, [http.Response? response])
       : code = response?.statusCode ?? 0,
         body = response?.body ?? '',
         url = response?.request?.url.toString();
 
   @override
-  String toString() => '$message: $code $body';
+  String toString() => '$message for $path: $code $body';
 }
 
 class PageProvider {
@@ -40,7 +41,7 @@ class PageProvider {
     final url = Uri.https(kBaseUrl);
     final response = await http.get(url);
     if (response.statusCode != 200) {
-      throw FetchError('Failed to get a cookie', response);
+      throw FetchError('Failed to get a cookie', '/', response);
     }
     final data =
         response.headers['set-cookie'] ?? response.headers['Set-Cookie'];
@@ -68,6 +69,15 @@ class PageProvider {
     );
   }
 
+  Future forgetPage(String path) async {
+    final db = await _ref.read(databaseProvider).database;
+    await db.delete(
+      CachedPage.kTableName,
+      where: 'url = ?',
+      whereArgs: [path],
+    );
+  }
+
   Future<String> fetchPage(String path) async {
     if (_cookie == null) await _updateCookie();
 
@@ -92,13 +102,16 @@ class PageProvider {
 
       if (response.statusCode != 200) {
         if (cached != null) return cached.content;
-        throw FetchError('Error on $path', response);
+        throw FetchError('Error', path, response);
       }
 
       body = utf8.decode(response.bodyBytes);
     } on TimeoutException {
       if (cached != null) return cached.content;
-      throw FetchError('Timeout for $path', null);
+      throw FetchError('Timeout', path);
+    }
+    if (body.length < 2) {
+      throw FetchError('Empty page', path);
     }
 
     _saveToCache(path, body);

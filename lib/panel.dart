@@ -70,16 +70,17 @@ class _WordPageState extends ConsumerState<WordPage>
 
     _lookingFor = value;
     Map<String, dynamic> data;
+    final pages = ref.read(pageProvider);
+    final path = ref.read(linksProvider.notifier).autocomplete(value);
     try {
-      final body = await ref
-          .read(pageProvider)
-          .fetchPage(ref.read(linksProvider.notifier).autocomplete(value));
+      final body = await pages.fetchPage(path);
       data = json.decode(body);
     } on FetchError catch (e) {
       _logger.severe('Fetch error', e);
       return;
     } on FormatException catch (e) {
       _logger.severe('Json decoding error', e);
+      pages.forgetPage(path);
       return;
     }
     if (_lookingFor != value) return;

@@ -99,10 +99,9 @@ class _WordViewState extends ConsumerState<WordView> {
   _updateMainPage() async {
     _error = null;
     _homonyms = const [];
+    final path = ref.read(linksProvider.notifier).search(widget.word.word);
     try {
-      final body = await ref
-          .read(pageProvider)
-          .fetchPage(ref.read(linksProvider.notifier).search(widget.word.word));
+      final body = await ref.read(pageProvider).fetchPage(path);
       _homonyms = SonaveebParsers.extractHomonyms(body);
     } on FetchError catch (e) {
       _logger.severe('Failed to fetch the word page', e);
@@ -113,6 +112,7 @@ class _WordViewState extends ConsumerState<WordView> {
     }
 
     if (_homonyms.isEmpty) {
+      ref.read(pageProvider).forgetPage(path);
       return;
     }
 
