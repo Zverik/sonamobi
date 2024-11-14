@@ -13,6 +13,12 @@
 - Added a link to Sõnaveeb when the history is full.
 - Better cache handling.
 
-## 0.1 (2024-??-??)
+## 0.1.1 (2024-11-01)
 
-Initial release
+- Fixed web page styling on iOS.
+- Moved the word forms panel inside web pages to make it scrollable.
+- Finished styling word form pages.
+
+## 0.1 (2024-10-23)
+
+Initial release, wasn't actually published.
