@@ -63,34 +63,36 @@ class _WordPageState extends ConsumerState<WordPage>
   }
 
   _autocomplete(String value) async {
-    setState(() {
-      found = value.length < 2 ? null : AutocompleteResults.empty;
-    });
-    if (value.length < 2) return;
+    if (value.length < 2) {
+      setState(() {
+        found = null;
+      });
+      return;
+    }
 
     _lookingFor = value;
     Map<String, dynamic> data;
     final pages = ref.read(pageProvider);
     final path = ref.read(linksProvider.notifier).autocomplete(value);
+    AutocompleteResults result = AutocompleteResults.empty;
     try {
       final body = await pages.fetchPage(path);
       data = json.decode(body);
-    } on FetchError catch (e) {
-      _logger.severe('Fetch error', e);
-      return;
-    } on FormatException catch (e) {
-      _logger.severe('Json decoding error', e);
-      pages.forgetPage(path);
-      return;
-    }
-    if (_lookingFor != value) return;
-    _lookingFor = null;
-
-    setState(() {
-      found = AutocompleteResults(
+      if (_lookingFor != value) return;
+      result = AutocompleteResults(
         found: (data['prefWords'] as List).whereType<String>().toList(),
         forms: (data['formWords'] as List).whereType<String>().toList(),
       );
+    } on FetchError catch (e) {
+      _logger.severe('Fetch error', e);
+    } on FormatException catch (e) {
+      _logger.severe('Json decoding error', e);
+      pages.forgetPage(path);
+    }
+    _lookingFor = null;
+
+    setState(() {
+      found = result;
     });
   }
 
@@ -125,6 +127,14 @@ class _WordPageState extends ConsumerState<WordPage>
       page = WordView(widget.word!);
     } else if (found == null) {
       page = const EmptyWordView();
+    } else if (found?.isEmpty ?? true) {
+      page = Center(
+        // TODO: style this better
+        child: Text(
+          'Ei leidnud midagi',
+          style: TextStyle(fontSize: 18),
+        ),
+      );
     } else {
       page = AutocompleteView(
         found: found!,

@@ -8,4 +8,14 @@ const kCountryFlags = {
   'ita': '🇮🇹',
 };
 
+const kCountryAbbrs = {
+  'est': '',
+  'eng': 'en',
+  'rus': 'ru',
+  'fra': 'fr',
+  'der': 'de',
+  'ukr': 'uk',
+  'ita': 'it',
+};
+
 const kDefaultCountryFlag = '';

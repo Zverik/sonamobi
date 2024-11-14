@@ -19,7 +19,7 @@ class HtmlFrameProvider {
       '<style>${buildCss(context)}</style>',
     ];
     String formsHtml;
-    if (forms == null) {
+    if (forms?.isEmpty ?? true) {
       formsHtml = '';
     } else {
       formsHtml = '<div id="forms-box"><a href="https://word.forms/"><table><tr><td>$forms</td><td id="forms-box-arrow">&#10749;</td></tr></table></a></div>';
@@ -271,6 +271,8 @@ b, strong { font-weight: bolder; }
   border-left: 1px solid #3f3f3f;
   transform: translateY(-50%);
 }
+
+.alert.bg-warning { font-size: 12px; color: %gray350%; }
 
 .text-nowrap { white-space: nowrap !important; }
 .font-weight-bold { font-weight: 700 !important; }

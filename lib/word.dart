@@ -7,7 +7,7 @@ import 'package:sonamobi/forms.dart';
 import 'package:sonamobi/providers/html_frame.dart';
 import 'package:sonamobi/providers/links.dart';
 import 'package:sonamobi/panel.dart' show WordPage;
-import 'package:sonamobi/util/flags.dart';
+import 'package:sonamobi/util/homonym.dart';
 import 'package:sonamobi/util/parsers.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
@@ -87,7 +87,7 @@ class _WordViewState extends ConsumerState<WordView> {
       ref.read(htmlFrameProvider).frame(
           id: 'wordpage',
           content: content,
-          forms: _pageData.formsRaw,
+          forms: _pageData.language == 'et' ? _pageData.formsRaw : '',
           context: context),
       baseUrl: kBaseUrl,
     );
@@ -170,30 +170,15 @@ class _WordViewState extends ConsumerState<WordView> {
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                for (int i = 0; i < _homonyms.length; i++) ...[
-                  if (i == _chosenHomonym)
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 4.0),
-                      child: Text(
-                        '${homonym.name} ${kCountryFlags[_homonyms[i].language] ?? ''}',
-                        style: TextStyle(
-                          fontSize: 28,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  if (i != _chosenHomonym)
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 4.0),
-                      child: ElevatedButton(
-                        onPressed: () {
-                          _changeHomonym(i);
-                        },
-                        child: Text(
-                            '${i + 1} ${kCountryFlags[_homonyms[i].language] ?? ''}'),
-                      ),
-                    ),
-                ],
+                for (int i = 0; i < _homonyms.length; i++)
+                  HomonymButton(
+                    homonym: _homonyms[i],
+                    isChosen: i == _chosenHomonym,
+                    label: '${i + 1}',
+                    onPressed: () {
+                      _changeHomonym(i);
+                    },
+                  ),
               ],
             ),
           ),

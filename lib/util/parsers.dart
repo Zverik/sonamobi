@@ -30,9 +30,10 @@ class SearchPageData {
   final List<WordForm> forms;
   final String formsRaw;
   final int? morphId;
+  final String? language;
 
   const SearchPageData(
-      {required this.forms, required this.formsRaw, this.morphId});
+      {required this.forms, required this.formsRaw, this.morphId, this.language});
 
   static const empty = SearchPageData(forms: [], formsRaw: '');
 }
@@ -130,10 +131,20 @@ class SonaveebParsers {
       // Use it as https://sonaveeb.ee/morpho/unif/1480786/est
     }
 
+    final title = document.getElementsByClassName('content-title');
+    String? language;
+    if (title.isNotEmpty) {
+      final langCode = title.first.getElementsByClassName('lang-code');
+      if (langCode.isNotEmpty) {
+        language = langCode.first.innerHtml.trim();
+      }
+    }
+
     return SearchPageData(
       forms: forms,
       formsRaw: formsRaw,
       morphId: paradigmId,
+      language: language,
     );
   }
 }

@@ -49,11 +49,11 @@ class EmptyWordView extends ConsumerWidget {
           GestureDetector(
             child: Container(
               padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 5.0),
-              color: isDark ? Colors.blue.shade900 : Colors.blue.shade100,
+              color: isDark ?  Color(0xff1f2c33) : Color(0xffccd9e0),
               child: Text(
                 'Ava sõnaveebi veebileht',
                 style: TextStyle(
-                  color: isDark ? Colors.blue.shade100 : Colors.blue.shade900,
+                  color: isDark ? Colors.blue.shade200 : Colors.blue.shade800,
                   fontSize: 18,
                 ),
               ),

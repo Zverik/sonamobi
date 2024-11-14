@@ -38,6 +38,7 @@ class PageProvider {
   PageProvider(this._ref);
 
   _updateCookie() async {
+    _logger.info('Updating cookie');
     final url = Uri.https(kBaseUrl);
     final response = await http.get(url);
     if (response.statusCode != 200) {
@@ -91,14 +92,32 @@ class PageProvider {
     final url = Uri.https(kBaseUrl, path);
     String body;
     try {
-      final response = await http.get(
+      http.Response response = await http.get(
         url,
         headers: {
           if (_cookie != null) 'Cookie': _cookie!,
           'Referer': 'https://sonaveeb.ee/',
-          'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64; rv:106.0) Sonamobi/0.1',
+          'User-Agent':
+              'Mozilla/5.0 (X11; Linux x86_64; rv:106.0) Sonamobi/0.1',
         },
       ).timeout(Duration(seconds: 2));
+
+      // Check that cookie is fresh, i.e. we didn't get the default page.
+      final cookieIsFresh = response.statusCode != 302 &&
+          !response.headers.containsKey('Location');
+      if (!cookieIsFresh) {
+        _cookie = null;
+        await _updateCookie();
+        response = await http.get(
+          url,
+          headers: {
+            if (_cookie != null) 'Cookie': _cookie!,
+            'Referer': 'https://sonaveeb.ee/',
+            'User-Agent':
+                'Mozilla/5.0 (X11; Linux x86_64; rv:106.0) Sonamobi/0.1',
+          },
+        ).timeout(Duration(seconds: 2));
+      }
 
       if (response.statusCode != 200) {
         if (cached != null) return cached.content;
