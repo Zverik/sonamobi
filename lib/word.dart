@@ -76,6 +76,7 @@ class _WordViewState extends ConsumerState<WordView> {
     } on FetchError catch (e) {
       _logger.severe('Failed to request homonyms', e);
       setState(() {
+        _loading = false;
         _error = 'Failed to request homonyms.';
       });
       return;
@@ -106,6 +107,7 @@ class _WordViewState extends ConsumerState<WordView> {
     } on FetchError catch (e) {
       _logger.severe('Failed to fetch the word page', e);
       setState(() {
+        _loading = false;
         _error = 'Failed to fetch the word page.';
       });
       return;

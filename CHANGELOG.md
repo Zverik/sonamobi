@@ -1,12 +1,14 @@
 # Sõnamobi Changelog
 
-## 0.3
+## 0.3 (2024-11-15)
 
 - Added "ei leidnud midagi" message when no words were found.
 - Replaced flags with language codes.
 - Removed forms for non-estonian words.
 - Tamed the Sõnaveeb link tile background.
+- Fixed offline work for cached words.
 - Fixed cookie obsoletion.
+- Fixed error messages for downloading troubles.
 
 ## 0.2 (2024-11-10)
 

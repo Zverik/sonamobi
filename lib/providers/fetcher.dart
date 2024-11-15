@@ -40,14 +40,18 @@ class PageProvider {
   _updateCookie() async {
     _logger.info('Updating cookie');
     final url = Uri.https(kBaseUrl);
-    final response = await http.get(url);
-    if (response.statusCode != 200) {
-      throw FetchError('Failed to get a cookie', '/', response);
-    }
-    final data =
-        response.headers['set-cookie'] ?? response.headers['Set-Cookie'];
-    if (data != null) {
-      _cookie = data.split(';')[0].trim();
+    try {
+      final response = await http.get(url).timeout(Duration(seconds: 2));
+      if (response.statusCode != 200) {
+        throw FetchError('Failed to get a cookie', '/', response);
+      }
+      final data =
+          response.headers['set-cookie'] ?? response.headers['Set-Cookie'];
+      if (data != null) {
+        _cookie = data.split(';')[0].trim();
+      }
+    } on Exception catch (e) {
+      throw FetchError('Failed to get a cookie: $e', '/');
     }
   }
 
@@ -80,14 +84,14 @@ class PageProvider {
   }
 
   Future<String> fetchPage(String path) async {
-    if (_cookie == null) await _updateCookie();
-
     final cached = await _fetchFromCache(path);
     if (cached != null &&
         DateTime.now().difference(cached.requestedAt) < kCacheDuration) {
       _logger.info('Got from cache: $path');
       return cached.content;
     }
+
+    if (_cookie == null) await _updateCookie();
 
     final url = Uri.https(kBaseUrl, path);
     String body;
@@ -128,6 +132,9 @@ class PageProvider {
     } on TimeoutException {
       if (cached != null) return cached.content;
       throw FetchError('Timeout', path);
+    } on Exception catch (e) {
+      if (cached != null) return cached.content;
+      throw FetchError('Exception when downloading: $e', path);
     }
     if (body.length < 2) {
       throw FetchError('Empty page', path);
