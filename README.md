@@ -8,6 +8,7 @@ Why is it better:
 * Less requests and caching, hence faster answers.
 * Easy to operate with one hand.
 * Words forms are easier accessible.
+* Translate definitions and examples with a tap.
 * History and bookmarks.
 * Dark mode.
 * No tracking.
