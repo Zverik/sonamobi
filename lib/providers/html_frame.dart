@@ -7,6 +7,7 @@ final htmlFrameProvider = Provider((ref) => HtmlFrameProvider(ref));
 
 class HtmlFrameProvider {
   static final _logger = Logger('HtmlFrameProvider');
+  static final _kReDefinition = RegExp(r'(<span class=".*(?:definition|example-text)-value[^>]+>)([^<]+)(</span>)');
   final Ref _ref;
 
   HtmlFrameProvider(this._ref);
@@ -18,12 +19,22 @@ class HtmlFrameProvider {
       '<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">',
       '<style>${buildCss(context)}</style>',
     ];
+
+    // Add a forms box with a link.
     String formsHtml;
     if (forms?.isEmpty ?? true) {
       formsHtml = '';
     } else {
       formsHtml = '<div id="forms-box"><a href="https://word.forms/"><table><tr><td>$forms</td><td id="forms-box-arrow">&#10749;</td></tr></table></a></div>';
     }
+
+    // Replace descriptions and examples with links.
+    content = content.replaceAllMapped(_kReDefinition, (match) {
+      final text = match.group(2)!;
+      return '${match.group(1)!}<a href="https://need.translate/?text=${Uri.encodeQueryComponent(text)}">${match.group(2)!}</a>${match.group(3)!}';
+    });
+
+    // All done, return the page.
     return '<html lang="en"><head>${head.join()}</head><body>$formsHtml<div id="$id">$content</div></body></html>';
   }
 
@@ -103,6 +114,11 @@ div.content-title { display: none !important; }
 #wordforms .modal-header { display: none !important; }
 #wordforms ul.nav { display: none !important; }
 #wordforms .paradigm-text { display: none !important; }
+
+.definition-value a, .example-text-value a {
+  color: inherit;
+  text-decoration: underline dotted %gray350%;
+}
 
 .collapse:not(.show) { display: none; }
 

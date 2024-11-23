@@ -1,7 +1,7 @@
 name: sonamobi
 description: Mobile interface to Sonaveeb
 publish_to: 'none'
-version: 0.3.0+4
+version: 0.4.0+5
 
 environment:
   sdk: ^3.5.3
@@ -11,6 +11,7 @@ dependencies:
     sdk: flutter
   animated_toggle_switch: ^0.8.3
   flutter_riverpod: ^2.1.1
+  gtranslate_v2: ^1.0.2
   html: ^0.15.1
   http: ^1.2.2
   intl: ^0.20.0
@@ -28,6 +29,9 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+  assets:
+    - assets/neurotolge.png
+    - assets/gtranslate.png
 
 flutter_launcher_icons:
   android: true

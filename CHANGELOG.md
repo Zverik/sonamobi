@@ -1,5 +1,9 @@
 # Sõnamobi Changelog
 
+## 0.4
+
+- Translate definitions and examples with a tap.
+
 ## 0.3 (2024-11-15)
 
 - Added "ei leidnud midagi" message when no words were found.

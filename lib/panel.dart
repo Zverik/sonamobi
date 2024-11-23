@@ -10,6 +10,7 @@ import 'package:sonamobi/util/debouncer.dart';
 import 'package:sonamobi/empty.dart';
 import 'package:sonamobi/providers/fetcher.dart';
 import 'package:sonamobi/providers/links.dart';
+import 'package:sonamobi/util/error.dart';
 import 'package:sonamobi/word.dart';
 
 class WordPage extends ConsumerStatefulWidget {
@@ -128,13 +129,7 @@ class _WordPageState extends ConsumerState<WordPage>
     } else if (found == null) {
       page = const EmptyWordView();
     } else if (found?.isEmpty ?? true) {
-      page = Center(
-        // TODO: style this better
-        child: Text(
-          'Ei leidnud midagi',
-          style: TextStyle(fontSize: 18),
-        ),
-      );
+      page = MessagePanel('Ei leidnud midagi');
     } else {
       page = AutocompleteView(
         found: found!,

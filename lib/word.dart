@@ -7,6 +7,8 @@ import 'package:sonamobi/forms.dart';
 import 'package:sonamobi/providers/html_frame.dart';
 import 'package:sonamobi/providers/links.dart';
 import 'package:sonamobi/panel.dart' show WordPage;
+import 'package:sonamobi/translate.dart';
+import 'package:sonamobi/util/error.dart';
 import 'package:sonamobi/util/homonym.dart';
 import 'package:sonamobi/util/parsers.dart';
 import 'package:webview_flutter/webview_flutter.dart';
@@ -43,23 +45,32 @@ class _WordViewState extends ConsumerState<WordView> {
     _webController.setJavaScriptMode(JavaScriptMode.disabled);
     _webController.setNavigationDelegate(
       NavigationDelegate(onNavigationRequest: (request) {
-        _logger.info('Tapped: "${request.url}"');
+        _logger.info('Nav request: "${request.url}"');
+        if (request.url.toString() == kBaseUrl) {
+          return NavigationDecision.navigate;
+        }
+
         if (request.url == 'https://word.forms/' && _pageData.morphId != null) {
           Navigator.of(context).push(MaterialPageRoute(
             builder: (_) => WordFormsPage(formId: _pageData.morphId ?? 1314487),
           ));
+        } else if (request.url.startsWith('https://need.translate/')) {
+          final uri = Uri.parse(request.url);
+          final text = uri.queryParameters['text'];
+          if (text != null) {
+            Navigator.of(context).push(MaterialPageRoute(
+              builder: (_) => TranslationPage(text, context: widget.word.word),
+            ));
+          }
+        } else {
+          final match = kReWord.matchAsPrefix(request.url);
+          if (match != null && match.groupCount > 0) {
+            final word = Uri.decodeComponent(match.group(1) ?? '');
+            Navigator.of(context).push(MaterialPageRoute(
+              builder: (_) => WordPage(word: WordRef.fromUrl(word)),
+            ));
+          }
         }
-        final match = kReWord.matchAsPrefix(request.url);
-        if (match != null && match.groupCount > 0) {
-          final word = Uri.decodeComponent(match.group(1) ?? '');
-          Navigator.of(context).push(MaterialPageRoute(
-            builder: (_) => WordPage(word: WordRef.fromUrl(word)),
-          ));
-        }
-        if (request.url.toString() == kBaseUrl) {
-          return NavigationDecision.navigate;
-        }
-        _logger.info('Prevented navigation.');
         return NavigationDecision.prevent;
       }),
     );
@@ -131,32 +142,20 @@ class _WordViewState extends ConsumerState<WordView> {
     await _changeHomonym(homonym);
   }
 
-  Widget _messageWidget(String message, [bool red = false]) {
-    return Center(
-      child: Text(
-        message,
-        style: TextStyle(
-          fontSize: 20,
-          color: red ? Colors.red : null,
-        ),
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     if (_loading) {
-      return _messageWidget('Laen alla...');
+      return MessagePanel('Laen alla...');
     }
 
     if (_error != null) {
-      return _messageWidget(_error ?? 'viga', true);
+      return MessagePanel(_error ?? 'viga', isError: true);
     }
 
     final homonym = _homonyms.isEmpty ? null : _homonyms[_chosenHomonym];
 
     if (homonym == null) {
-      return _messageWidget('Pole homonüüme');
+      return MessagePanel('Pole homonüüme', isError: true);
     }
 
     return Column(

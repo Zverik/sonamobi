@@ -1,4 +1,5 @@
 screenshots/
+lib/keys.dart
 
 # Miscellaneous
 *.class
