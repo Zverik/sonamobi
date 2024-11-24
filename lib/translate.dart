@@ -18,7 +18,7 @@ class TranslationPage extends ConsumerStatefulWidget {
 
 class _TranslationPageState extends ConsumerState<TranslationPage> {
   static final _logger = Logger('TranslationPage');
-  String translation = '...';
+  String? translation;
   String? error;
 
   @override
@@ -73,7 +73,12 @@ class _TranslationPageState extends ConsumerState<TranslationPage> {
               padding: const EdgeInsets.symmetric(vertical: 8.0),
               child: Divider(),
             ),
-            Text(translation, style: textStyle),
+            Text(
+              translation ?? widget.text,
+              style: textStyle.copyWith(
+                color: translation == null ? Colors.grey : null,
+              ),
+            ),
           ],
         ),
       );
@@ -90,7 +95,13 @@ class _TranslationPageState extends ConsumerState<TranslationPage> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Expanded(
-              child: panel,
+              child: GestureDetector(
+                onTap: () {
+                  Navigator.pop(context);
+                },
+                behavior: HitTestBehavior.opaque,
+                child: panel,
+              ),
             ),
             TextButton.icon(
               icon: Image.asset(tc.provider.image, width: 24.0),
@@ -99,9 +110,11 @@ class _TranslationPageState extends ConsumerState<TranslationPage> {
                 style: TextStyle(fontSize: 20),
               ),
               onPressed: () {
-                Navigator.push(context, MaterialPageRoute(
-                  builder: (_) => LanguageChooser(),
-                ));
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => LanguageChooser(),
+                    ));
               },
             ),
             SulgeButton(),
