@@ -15,6 +15,19 @@ Why is it better:
 
 The app is not authorized by EKI, it's an independent work.
 
+## Building instructions
+
+It's a regular Flutter application, so the instructions are as usual. Although
+first you need to open your [Google Cloud Console](https://console.cloud.google.com/apis/dashboard),
+add a Cloud Translation API, and generate an API key. Then copy
+`lib/keys.dart.example` to `lib/keys.dart` and put the key in there.
+Finally,
+
+    flutter pub get
+    flutter run
+
+Or whatever you need.
+
 ## Author and License
 
 Written by Ilja Zverev, published under the ISC license.
