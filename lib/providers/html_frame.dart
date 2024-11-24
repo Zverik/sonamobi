@@ -117,7 +117,9 @@ div.content-title { display: none !important; }
 
 .definition-value a, .example-text-value a {
   color: inherit;
-  text-decoration: underline dotted %gray350%;
+  text-decoration: underline;
+  text-decoration-style: dotted;
+  text-decoration-color: %gray350%;
 }
 
 .collapse:not(.show) { display: none; }
