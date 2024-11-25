@@ -1,6 +1,6 @@
 # Sõnamobi Changelog
 
-## 0.4
+## 0.4 (2024-11-24)
 
 - Translate definitions and examples with a tap.
 
