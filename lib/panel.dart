@@ -6,6 +6,7 @@ import 'package:sonamobi/autocomplete.dart';
 import 'package:sonamobi/log.dart';
 import 'package:sonamobi/models/wordref.dart';
 import 'package:sonamobi/providers/history.dart';
+import 'package:sonamobi/providers/translation.dart';
 import 'package:sonamobi/util/debouncer.dart';
 import 'package:sonamobi/empty.dart';
 import 'package:sonamobi/providers/fetcher.dart';
@@ -39,6 +40,8 @@ class _WordPageState extends ConsumerState<WordPage>
     _searching = widget.word == null;
     if (widget.word != null) {
       ref.read(historyProvider).addView(widget.word!, ref.read(linksProvider));
+      // Also initialize the translations provider.
+      ref.read(translationProvider.notifier);
     }
     WidgetsBinding.instance.addObserver(this);
   }

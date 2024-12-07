@@ -1,5 +1,11 @@
 # Sõnamobi Changelog
 
+## 0.5
+
+- Swipe between homonyms.
+- Changed "form:" prefix to an emoji.
+- Fixed initial translation language being Russian.
+
 ## 0.4 (2024-11-24)
 
 - Translate definitions and examples with a tap.

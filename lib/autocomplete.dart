@@ -39,7 +39,7 @@ class AutocompleteView extends StatelessWidget {
         final item = found.get(index);
         return ListTile(
           title: Text(
-            item.isForm ? 'form: ${item.word}' : item.word,
+            item.isForm ? '✳️ ${item.word}' : item.word,
             style: TextStyle(fontSize: 18),
           ),
           onTap: () {

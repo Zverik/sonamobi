@@ -1,3 +1,5 @@
+import 'package:flutter/foundation.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logging/logging.dart';
@@ -31,19 +33,20 @@ class _WordViewState extends ConsumerState<WordView> {
   List<Homonym> _homonyms = const [];
   SearchPageData _pageData = SearchPageData.empty;
   int _chosenHomonym = 0;
-  final WebViewController _webController = WebViewController();
+  final _webControllers = <WebViewController>[];
+  final _loaded = <bool>[];
+  PageController _pageController = PageController();
 
   @override
   void initState() {
     super.initState();
-    _initController();
     _updateMainPage();
   }
 
-  _initController() {
+  void _initController(WebViewController controller) {
     final kReWord = ref.read(linksProvider.notifier).searchRegExp;
-    _webController.setJavaScriptMode(JavaScriptMode.disabled);
-    _webController.setNavigationDelegate(
+    controller.setJavaScriptMode(JavaScriptMode.disabled);
+    controller.setNavigationDelegate(
       NavigationDelegate(onNavigationRequest: (request) {
         _logger.info('Nav request: "${request.url}"');
         if (request.url.toString() == kBaseUrl) {
@@ -79,6 +82,11 @@ class _WordViewState extends ConsumerState<WordView> {
   _changeHomonym(int idx) async {
     _error = null;
     _chosenHomonym = idx;
+    if (_loaded[idx]) {
+      setState(() {});
+      return;
+    }
+
     String content;
     try {
       content = await ref.read(pageProvider).fetchPage(ref
@@ -95,7 +103,7 @@ class _WordViewState extends ConsumerState<WordView> {
     _pageData = SonaveebParsers.parseSearchPage(content);
 
     if (!mounted) return;
-    await _webController.loadHtmlString(
+    await _webControllers[idx].loadHtmlString(
       ref.read(htmlFrameProvider).frame(
           id: 'wordpage',
           content: content,
@@ -103,6 +111,7 @@ class _WordViewState extends ConsumerState<WordView> {
           context: context),
       baseUrl: kBaseUrl,
     );
+    _loaded[idx] = true;
     setState(() {
       _loading = false;
     });
@@ -139,6 +148,13 @@ class _WordViewState extends ConsumerState<WordView> {
       }
     }
 
+    for (int i = 0; i < _homonyms.length; i++) {
+      _webControllers.add(WebViewController());
+      _loaded.add(false);
+      _initController(_webControllers[i]);
+    }
+
+    _pageController = PageController(initialPage: homonym);
     await _changeHomonym(homonym);
   }
 
@@ -178,6 +194,7 @@ class _WordViewState extends ConsumerState<WordView> {
                     label: '${i + 1}',
                     onPressed: () {
                       _changeHomonym(i);
+                      _pageController.jumpToPage(i);
                     },
                   ),
               ],
@@ -186,7 +203,18 @@ class _WordViewState extends ConsumerState<WordView> {
         ),
 
         Expanded(
-          child: WebViewWidget(controller: _webController),
+          child: PageView.builder(
+            controller: _pageController,
+            onPageChanged: (idx) => _changeHomonym(idx),
+            itemCount: _homonyms.length,
+            itemBuilder: (context, idx) => WebViewWidget(
+              controller: _webControllers[idx],
+              gestureRecognizers: {
+                Factory<VerticalDragGestureRecognizer>(
+                    () => VerticalDragGestureRecognizer())
+              },
+            ),
+          ),
         ),
       ],
     );

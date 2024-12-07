@@ -40,9 +40,9 @@ class TranslationController extends StateNotifier<TranslationConfig> {
     TranslationConfig(TranslationProvider.neurotolge, 'ger', 'Deutsch'),
   ];
   static final _googleVariants = <TranslationConfig>[
+    TranslationConfig(TranslationProvider.google, 'en', 'English'),
     TranslationConfig(TranslationProvider.google, 'ru', 'Русский'),
     TranslationConfig(TranslationProvider.google, 'uk', 'Українська мова'),
-    TranslationConfig(TranslationProvider.google, 'en', 'English'),
     TranslationConfig(TranslationProvider.google, 'lv', 'Latviešu valoda'),
     TranslationConfig(TranslationProvider.google, 'de', 'Deutsch'),
     TranslationConfig(TranslationProvider.google, 'fr', 'Français'),
@@ -52,7 +52,7 @@ class TranslationController extends StateNotifier<TranslationConfig> {
     TranslationConfig(TranslationProvider.google, 'ar', 'اَلْعَرَبِيَّةُ'),
   ];
 
-  static final defaultConfig = _neurotolgeVariants[0];
+  static final defaultConfig = _neurotolgeVariants[1];
 
   late final GTranslateV2 api;
   List<TranslationConfig> _cachedVariants = const [];
