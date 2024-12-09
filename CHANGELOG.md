@@ -4,6 +4,7 @@
 
 - Swipe between homonyms.
 - Changed "form:" prefix to an emoji.
+- When autocomplete fails, trying for HTML suggestions.
 - Fixed initial translation language being Russian.
 
 ## 0.4 (2024-11-24)

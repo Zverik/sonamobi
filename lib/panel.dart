@@ -12,6 +12,7 @@ import 'package:sonamobi/empty.dart';
 import 'package:sonamobi/providers/fetcher.dart';
 import 'package:sonamobi/providers/links.dart';
 import 'package:sonamobi/util/error.dart';
+import 'package:sonamobi/util/parsers.dart';
 import 'package:sonamobi/word.dart';
 
 class WordPage extends ConsumerStatefulWidget {
@@ -87,6 +88,18 @@ class _WordPageState extends ConsumerState<WordPage>
         found: (data['prefWords'] as List).whereType<String>().toList(),
         forms: (data['formWords'] as List).whereType<String>().toList(),
       );
+
+      if (result.isEmpty) {
+        // Fetch the actual html page and check it for more options.
+        final path2 = ref.read(linksProvider.notifier).search(value);
+        final body2 = await ref.read(pageProvider).fetchPage(path2);
+        if (_lookingFor != value) return;
+        final suggestions = SonaveebParsers.getWordSuggestions(body2);
+        result = AutocompleteResults(
+          found: const [],
+          forms: suggestions,
+        );
+      }
     } on FetchError catch (e) {
       _logger.severe('Fetch error', e);
     } on FormatException catch (e) {

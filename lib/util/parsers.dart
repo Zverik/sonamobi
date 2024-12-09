@@ -147,4 +147,18 @@ class SonaveebParsers {
       language: language,
     );
   }
+
+  static List<String> getWordSuggestions(String body) {
+    final document = parse(body);
+    final results = <String>[];
+    final details = document.getElementsByClassName('word-details');
+    if (details.isNotEmpty) {
+      final forms = details.first.getElementsByClassName('word-form');
+      for (final form in forms) {
+        final attr = form.attributes['data-word'];
+        if (attr != null) results.add(attr);
+      }
+    }
+    return results;
+  }
 }
