@@ -33,6 +33,7 @@ class PageProvider {
   static final _logger = Logger('PageProvider');
 
   String? _cookie;
+  DateTime? _cookieDate;
   final Ref _ref;
 
   PageProvider(this._ref);
@@ -49,6 +50,7 @@ class PageProvider {
           response.headers['set-cookie'] ?? response.headers['Set-Cookie'];
       if (data != null) {
         _cookie = data.split(';')[0].trim();
+        _cookieDate = DateTime.now();
       }
     } on Exception catch (e) {
       throw FetchError('Failed to get a cookie: $e', '/');
@@ -91,7 +93,10 @@ class PageProvider {
       return cached.content;
     }
 
-    if (_cookie == null) await _updateCookie();
+    final isCookieOld =
+        DateTime.now().difference(_cookieDate ?? DateTime(2023)) >
+            Duration(hours: 1);
+    if (_cookie == null || isCookieOld) await _updateCookie();
 
     final url = Uri.https(kBaseUrl, path);
     String body;
