@@ -1,9 +1,10 @@
 # Sõnamobi Changelog
 
-## 0.5
+## 0.5 (2024-12-11)
 
 - Swipe between homonyms.
 - Changed "form:" prefix to an emoji.
+- Precise found result made to be the first in the list.
 - When autocomplete fails, trying for HTML suggestions.
 - Fixed initial translation language being Russian.
 

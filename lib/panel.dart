@@ -87,6 +87,7 @@ class _WordPageState extends ConsumerState<WordPage>
       result = AutocompleteResults(
         found: (data['prefWords'] as List).whereType<String>().toList(),
         forms: (data['formWords'] as List).whereType<String>().toList(),
+        searched: value,
       );
 
       if (result.isEmpty) {
@@ -98,6 +99,7 @@ class _WordPageState extends ConsumerState<WordPage>
         result = AutocompleteResults(
           found: suggestions,
           forms: const [],
+          searched: value,
         );
       }
     } on FetchError catch (e) {
