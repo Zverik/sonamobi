@@ -96,8 +96,8 @@ class _WordPageState extends ConsumerState<WordPage>
         if (_lookingFor != value) return;
         final suggestions = SonaveebParsers.getWordSuggestions(body2);
         result = AutocompleteResults(
-          found: const [],
-          forms: suggestions,
+          found: suggestions,
+          forms: const [],
         );
       }
     } on FetchError catch (e) {
