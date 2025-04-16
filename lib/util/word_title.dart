@@ -17,7 +17,10 @@ class WordAppBarTitle extends ConsumerWidget {
     final homonyms = ref.watch(homonymsProvider(word)).valueOrNull;
     final chosenHomonym = ref.watch(chosenHomonymIndexProvider(word));
     final homonymCount = homonyms?.length ?? 0;
-    final Homonym? homonym = homonyms == null ? null : homonyms[chosenHomonym];
+    final Homonym? homonym =
+        homonyms == null || chosenHomonym >= homonyms.length
+            ? null
+            : homonyms[chosenHomonym];
 
     final String flag = kCountryAbbrs[homonym?.language] ?? '';
     final isDark = ref.read(nightModeProvider.notifier).isDark(context);
@@ -26,7 +29,7 @@ class WordAppBarTitle extends ConsumerWidget {
 
     return Row(
       children: [
-        if (homonymCount> 1)
+        if (homonymCount > 1)
           GestureDetector(
             child: Container(
               decoration: BoxDecoration(

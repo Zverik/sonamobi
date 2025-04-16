@@ -103,8 +103,17 @@ class _WordPageState extends ConsumerState<WordPage>
           IconButton(
             icon: ImageIcon(AssetImage('assets/sonaveeb.png')),
             onPressed: () {
-              final homonym = ref.read(chosenHomonymProvider(widget.word));
-              launchUrl(Uri.https('sonaveeb.ee', Uri.decodeComponent(homonym?.url ?? '')));
+              String url = '';
+              if (!_searching && widget.word != null) {
+                final homonym = ref.read(chosenHomonymProvider(widget.word));
+                url = homonym?.url ?? '';
+                if (url.isEmpty) {
+                  url = ref
+                      .read(linksProvider.notifier)
+                      .search(widget.word!.word);
+                }
+              }
+              launchUrl(Uri.https('sonaveeb.ee', url));
             },
           ),
         ],

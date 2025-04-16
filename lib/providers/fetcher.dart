@@ -28,6 +28,7 @@ class FetchError implements Exception {
 
 class PageProvider {
   static const kCacheDuration = Duration(days: 30);
+  static final kOldestValidCache = DateTime(2025, 4, 11);
   static const kBaseUrl = 'sonaveeb.ee';
 
   static final _logger = Logger('PageProvider');
@@ -88,7 +89,8 @@ class PageProvider {
   Future<String> fetchPage(String path) async {
     final cached = await _fetchFromCache(path);
     if (cached != null &&
-        DateTime.now().difference(cached.requestedAt) < kCacheDuration) {
+        DateTime.now().difference(cached.requestedAt) < kCacheDuration &&
+        cached.requestedAt.isAfter(kOldestValidCache)) {
       _logger.info('Got from cache: $path');
       return cached.content;
     }

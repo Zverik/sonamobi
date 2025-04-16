@@ -5,7 +5,7 @@ import 'package:logging/logging.dart';
 class Homonym {
   final int id;
   final int? homonymId;
-  final String name;
+  final String? name;
   final String language;
   final String? matches;
   final String? intro;
@@ -80,6 +80,9 @@ class SonaveebParsers {
           wordId = int.tryParse(inputElement.attributes['value']!);
         } else if (inputElement.attributes['name'] == 'word-select-url') {
           url = inputElement.attributes['value'];
+          if (url != null) {
+            url = Uri.decodeComponent(url);
+          }
           final urlMatch =
               RegExp(r'd?all/[^/]+/(\d+)/(\w+)$').firstMatch(url ?? '');
           if (urlMatch != null) {
@@ -115,7 +118,7 @@ class SonaveebParsers {
           .firstOrNull;
       String? intro = introElement?.text;
 
-      if (wordId != null && name != null && lang != null) {
+      if (wordId != null && lang != null) {
         homonyms.add(Homonym(
           id: wordId,
           homonymId: homonymId,

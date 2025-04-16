@@ -73,7 +73,7 @@ class _WordSearchBarState extends ConsumerState<WordSearchBar>
                 value = value.trim();
                 if (_checkSystem(value)) {
                   _searchController.clear();
-                  return;
+                  value = '';
                 }
                 widget.onUpdateWord(value);
               },
