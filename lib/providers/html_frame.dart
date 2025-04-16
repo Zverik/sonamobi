@@ -13,7 +13,7 @@ class HtmlFrameProvider {
   static final _kReExample = RegExp(
       r'(<span class="example-text[^>]+>[^<]*<span [^>]+>)([^<]+)(</span>)',
       dotAll: true);
-  static final _kReWordForm = RegExp(r'<td>\s*<span [^>]+>([^<]+)</span>');
+  static final _kReWordForm = RegExp(r'<td>\s*<span [^>]+>([^<]+)<(?:eki|/span)');
   final Ref _ref;
 
   HtmlFrameProvider(this._ref);
