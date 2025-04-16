@@ -98,16 +98,14 @@ class _WordViewState extends ConsumerState<WordView> {
     }
 
     if (homonyms.hasError) {
-      return MessagePanel(homonyms.error.toString() ?? 'viga', isError: true);
+      return MessagePanel(homonyms.error.toString(), isError: true);
     }
 
     if (_error != null) {
       return MessagePanel(_error ?? 'viga', isError: true);
     }
 
-    final homonym = ref.watch(chosenHomonymProvider(widget.word));
-
-    if (homonym == null) {
+    if (homonyms.value?.isEmpty ?? true) {
       return MessagePanel('Pole homonüüme', isError: true);
     }
 

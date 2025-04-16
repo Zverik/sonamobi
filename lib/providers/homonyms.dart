@@ -60,11 +60,13 @@ final chosenHomonymProvider =
   if (word == null) return null;
   final homonyms = ref.watch(homonymsProvider(word)).valueOrNull;
   final chosenHomonym = ref.watch(chosenHomonymIndexProvider(word));
-  return homonyms == null ? null : homonyms[chosenHomonym];
+  return homonyms == null || chosenHomonym >= homonyms.length
+      ? null
+      : homonyms[chosenHomonym];
 });
 
-final homonymPageProvider =
-    FutureProvider.autoDispose.family<SearchPageData, Homonym?>((ref, homonym) async {
+final homonymPageProvider = FutureProvider.autoDispose
+    .family<SearchPageData, Homonym?>((ref, homonym) async {
   if (homonym == null) return SearchPageData.empty;
 
   String content;

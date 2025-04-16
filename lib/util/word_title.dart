@@ -46,7 +46,7 @@ class WordAppBarTitle extends ConsumerWidget {
             },
           ),
         Text(
-          homonym?.name ?? '?',
+          homonym?.name ?? word.word,
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
         if (flag.isNotEmpty)
