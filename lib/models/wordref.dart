@@ -20,4 +20,17 @@ class WordRef {
   }
 
   String toUrl() => homonym == null ? word : '$word/$homonym/$language';
+
+  @override
+  String toString() => 'WordRef(${toUrl()})';
+
+  @override
+  bool operator ==(Object other) =>
+      other is WordRef &&
+      other.word == word &&
+      other.homonym == homonym &&
+      other.language == language;
+
+  @override
+  int get hashCode => Object.hash(word, homonym, language);
 }

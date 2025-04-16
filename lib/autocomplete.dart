@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class AutocompleteItem {
   final String word;
@@ -18,7 +19,8 @@ class AutocompleteResults {
       {required this.found, required this.forms, this.searched});
 
   bool get isEmpty => found.isEmpty && forms.isEmpty;
-  int length() => found.length + forms.length;
+  bool get isNotEmpty => found.isNotEmpty || forms.isNotEmpty;
+  int get length => found.length + forms.length;
   bool get isSearchFound =>
       found.isNotEmpty &&
       searched != null &&
@@ -52,22 +54,52 @@ class AutocompleteView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListView.separated(
+    final colorBackground1 = Theme.of(context).scaffoldBackgroundColor;
+    final hslColor = HSLColor.fromColor(colorBackground1).withSaturation(0.0);
+    final colorBackground2 = hslColor
+        .withLightness(hslColor.lightness < 0.5
+            ? hslColor.lightness + 0.08
+            : hslColor.lightness - 0.03)
+        .toColor();
+
+    return ListView.builder(
       reverse: true,
-      itemCount: found.length(),
+      itemCount: found.length,
       itemBuilder: (context, index) {
         final item = found.get(index);
-        return ListTile(
-          title: Text(
-            item.isForm ? '✳️ ${item.word}' : item.word,
-            style: TextStyle(fontSize: 18),
+        return GestureDetector(
+          child: Container(
+            color: index.isEven ? colorBackground1 : colorBackground2,
+            padding: EdgeInsets.symmetric(vertical: 6.0, horizontal: 10.0),
+            child: Row(
+              children: [
+                if (item.isForm)
+                  Container(
+                    decoration: BoxDecoration(
+                      color: index.isOdd ? colorBackground1 : colorBackground2,
+                      borderRadius: BorderRadius.circular(3.0),
+                    ),
+                    padding: EdgeInsets.symmetric(horizontal: 4.0),
+                    margin: EdgeInsets.only(right: 12.0),
+                    child: Text('VORM', style: GoogleFonts.ptSansNarrow()),
+                  ),
+                Text(
+                  item.word,
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: index == 0 && found.isSearchFound
+                        ? FontWeight.bold
+                        : FontWeight.normal,
+                  ),
+                ),
+              ],
+            ),
           ),
           onTap: () {
             onTap(item.word);
           },
         );
       },
-      separatorBuilder: (BuildContext context, int index) => Divider(),
     );
   }
 }

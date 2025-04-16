@@ -22,7 +22,7 @@ class HistoryController extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<List<HistoryEntry>> fetchHistory([int limit = 100]) async {
+  Future<List<HistoryEntry>> fetchHistory([int limit = 50]) async {
     final db = await _ref.read(databaseProvider).database;
     final rows = await db.query(
       HistoryEntry.kTableName,
@@ -41,7 +41,8 @@ class HistoryController extends ChangeNotifier {
     return rows.map((row) => HistoryEntry.fromJson(row)).toList();
   }
 
-  Future addView(WordRef word, bool simple) async {
+  Future addView(WordRef word,
+      {bool updateTime = true, bool simple = false}) async {
     final entry = HistoryEntry(word.word);
     final db = await _ref.read(databaseProvider).database;
     final rows = await db.query(
@@ -52,13 +53,15 @@ class HistoryController extends ChangeNotifier {
     final dbEntry =
         rows.map((row) => HistoryEntry.fromJson(row)).firstOrNull ?? entry;
     dbEntry.views += 1;
-    dbEntry.lastAccessed = DateTime.now();
+    if (updateTime) {
+      dbEntry.lastAccessed = DateTime.now();
+    }
     await db.insert(
       HistoryEntry.kTableName,
       dbEntry.toJson(),
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
-    
+
     // Update the cached history.
     history = await fetchHistory();
     notifyListeners();

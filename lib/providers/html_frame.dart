@@ -7,12 +7,38 @@ final htmlFrameProvider = Provider((ref) => HtmlFrameProvider(ref));
 
 class HtmlFrameProvider {
   static final _logger = Logger('HtmlFrameProvider');
-  static final _kReDefinition = RegExp(r'(<span class=".*(?:definition|example-text)-value[^>]+>)([^<]+)(</span>)');
+  static final _kReDefinition =
+      RegExp(r'(<span class="definition-value[^>]+>)([^<]+)(</span>)');
+  // static final _kReExample = RegExp(r'(<span class="example-text[^>]+>)(.)(.)', dotAll: true);
+  static final _kReExample = RegExp(
+      r'(<span class="example-text[^>]+>[^<]*<span [^>]+>)([^<]+)(</span>)',
+      dotAll: true);
+  static final _kReWordForm = RegExp(r'<td>\s*<span [^>]+>([^<]+)</span>');
   final Ref _ref;
 
   HtmlFrameProvider(this._ref);
 
-  String frame({required String id, required String content, String? forms, BuildContext? context}) {
+  String _makeFormsTable(String? table, int? morphId) {
+    if (table == null || table.isEmpty) {
+      return '';
+    }
+
+    // Check if it's an unmodifiable word.
+    final forms = _kReWordForm.allMatches(table);
+    if (forms.length == 1) {
+      return '<div id="forms-box"><table><tbody><tr><td><span class="form-value-field">${forms.first.group(1)}</span></td><td><span class="muutumatu">(muutumatu)</span></td></tr></tbody></table></div>';
+    }
+
+    // Okay just return the table.
+    return '<div id="forms-box"><a href="https://word.forms/${morphId?.toString() ?? ""}"><table><tr><td>$table</td><td id="forms-box-arrow">&#10749;</td></tr></table></a></div>';
+  }
+
+  String frame(
+      {required String id,
+      required String content,
+      int? morphId,
+      String? forms,
+      BuildContext? context}) {
     final head = [
       '<title>page</title>',
       '<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">',
@@ -21,15 +47,14 @@ class HtmlFrameProvider {
     ];
 
     // Add a forms box with a link.
-    String formsHtml;
-    if (forms?.isEmpty ?? true) {
-      formsHtml = '';
-    } else {
-      formsHtml = '<div id="forms-box"><a href="https://word.forms/"><table><tr><td>$forms</td><td id="forms-box-arrow">&#10749;</td></tr></table></a></div>';
-    }
+    String formsHtml = _makeFormsTable(forms, morphId);
 
     // Replace descriptions and examples with links.
     content = content.replaceAllMapped(_kReDefinition, (match) {
+      final text = match.group(2)!;
+      return '${match.group(1)!}<a href="https://need.translate/?text=${Uri.encodeQueryComponent(text)}">${match.group(2)!}</a>${match.group(3)!}';
+    });
+    content = content.replaceAllMapped(_kReExample, (match) {
       final text = match.group(2)!;
       return '${match.group(1)!}<a href="https://need.translate/?text=${Uri.encodeQueryComponent(text)}">${match.group(2)!}</a>${match.group(3)!}';
     });
@@ -65,13 +90,14 @@ extension HexColor on Color {
     return Color(int.parse(buffer.toString(), radix: 16));
   }
 
+  static String _toHexByte(double v) =>
+      ((v * 255.0).round() & 0xff).toRadixString(16).padLeft(2, '0');
+
   /// Prefixes a hash sign if [leadingHashSign] is set to `true` (default is `true`).
   String toHex({bool leadingHashSign = true, bool outputAlpha = false}) =>
       '${leadingHashSign ? '#' : ''}'
-      '${outputAlpha ? alpha.toRadixString(16).padLeft(2, '0') : ''}'
-      '${red.toRadixString(16).padLeft(2, '0')}'
-      '${green.toRadixString(16).padLeft(2, '0')}'
-      '${blue.toRadixString(16).padLeft(2, '0')}';
+      '${outputAlpha ? _toHexByte(a) : ''}'
+      '${_toHexByte(r)}${_toHexByte(g)}${_toHexByte(b)}';
 }
 
 const kCssCommon = '''
@@ -86,7 +112,7 @@ body {
   text-align: left;
 }
 a { color: %a%; }
-div.word-details { margin: 8px; }
+div.word-results { margin: 8px; }
 div.content-title { display: none !important; }
 .level-2-panel h5.meaning-sub-heading:first-child { display: none !important; }
 .btn-speaker { display: none !important; }
@@ -107,6 +133,9 @@ div.content-title { display: none !important; }
   padding-right: 24px;
   font-size: 20px;
 }
+#forms-box td .muutumatu {
+  font-style: italic;
+}
 #forms-box > a > table { width: 100%; }
 #forms-box eki-form { color: %text%; }
 #forms-box #forms-box-arrow { text-alight: right; padding: 0; margin: 0; }
@@ -115,7 +144,7 @@ div.content-title { display: none !important; }
 #wordforms ul.nav { display: none !important; }
 #wordforms .paradigm-text { display: none !important; }
 
-.definition-value a, .example-text-value a {
+.definition-value a, .example-text a {
   color: inherit;
   text-decoration: underline;
   text-decoration-style: dotted;
@@ -177,7 +206,6 @@ eki-stress::after {
 
 .level-3-panel {
   position: relative;
-  padding: 1rem;
   border-bottom: 1px solid %lightgray%;
 }
 
@@ -222,6 +250,9 @@ eki-stress::after {
 .mb-2 { margin-bottom: 0.5rem !important; }
 .mb-1 { margin-bottom: 0.25rem !important; }
 .mb-0 { margin-bottom: 0 !important; }
+.mt-2 { margin-top: 0.5rem !important; }
+.mt-1 { margin-top: 0.25rem !important; }
+.mt-0 { margin-top: 0 !important; }
 .pr-2 { padding-right: 0.5rem !important; }
 .pl-2 { padding-left: 0.5rem !important; }
 .pl-3 { padding-left: 1rem !important; }
@@ -243,6 +274,7 @@ b, strong { font-weight: bolder; }
 .align-self-start { align-self: flex-start !important; }
 .align-items-end { align-items: flex-end !important; }
 .d-inline-flex { display: inline-flex !important; }
+.gap-2 { gap: 8px; }
 
 .w-100 { width: 100% !important; }
 .h-100 { height: 100% !important; }
@@ -386,12 +418,66 @@ th { text-align: inherit; }
   padding-top: 20px;
   padding-bottom: 0;
 }
+
+/* April 2025 changes */
+
+.word-results > div > div.d-flex { display: none !important; }
+.word-results .search__pre-block-title { display: none; }
+.word-results .search__block--unified .search__block-title { display: none; }
+.meaning-data__modified, .meaning-data__link { display: none; }
+.meaning-data__popover-trigger { display: none; }
+
+button.btn-ellipsis { border: none; }
+.text-caption {
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+}
+.search__helper-text { color: %gray350%; }
+.search__block-title {
+  font-size: 22px;
+  font-weight: 700;
+  margin-bottom: 0px;
+}
+.word-notes__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  line-height: 20px;
+}
+.word-notes__wrapper {
+  margin-bottom: 8px;
+  display: flex;
+  flex-direction: column;
+}
+.lang-code__border { margin-top: 8px; }
+
+.search__block-header {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px;
+  flex-grow: 1;
+  margin: 0 0 16px;
+}
+.search__sidebar-block-title {
+  font-weight: 700;
+  font-size: 22px;
+  line-height: 20px;
+  margin: 0 8px 0 0;
+}
+.search__block {
+  margin-top: 16px;
+}
+.search__sidebar-block::first-child { margin-top: 0; }
+.search__block--unified { margin-top: 0 !important; }
 ''';
 
 const kColorsLight = {
   'a': '#2962FF',
   'gray350': '#687887',
-  'lightgray': '#ccd9e0',
+  'lightgray': '#d1dee6',
   'lang': '#ecf0f2',
   'langtext': '#5d606e',
   'button': '#3f3f3f',
@@ -400,7 +486,7 @@ const kColorsLight = {
 const kColorsDark = {
   'a': '#75FAF1',
   'gray350': '#687887',
-  'lightgray': '#1F2C33',
+  'lightgray': '#273740',
   'lang': '#1F2C33', // '#0D1113',
   'langtext': '#9194A2',
   'button': '#c0c0c0',

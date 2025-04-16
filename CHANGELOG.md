@@ -1,5 +1,16 @@
 # Sõnamobi Changelog
 
+## 1.0 (2025-04-17)
+
+- Sõnaveeb has updated its pages, breaking the app.
+- Major refactoring, some things may be broken, but overall it works.
+- Introduced an app bar with a button to open Sõnaveeb for the current word.
+- Light/dark theme switcher went to the app bar.
+- Removed buttons for word forms: use the counter in the app bar or swipe left/right.
+- History scrolling position and the search term remain when pressing "back".
+- Search results are more compact and colored in stripes.
+- Changed the form emoji to the explicit "VORM".
+
 ## 0.5 (2024-12-11)
 
 - Swipe between homonyms.

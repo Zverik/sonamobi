@@ -1,4 +1,3 @@
-import 'package:animated_toggle_switch/animated_toggle_switch.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sonamobi/panel.dart' show WordPage;
@@ -19,25 +18,6 @@ class EmptyWordView extends ConsumerWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        SizedBox(height: 10.0),
-        ListTile(
-          title: Text('Heledus'),
-          trailing: AnimatedToggleSwitch<ThemeMode>.rolling(
-            current: ref.watch(nightModeProvider),
-            values: [ThemeMode.system, ThemeMode.light, ThemeMode.dark],
-            iconBuilder: (mode, current) => Icon(
-              nightModeIcon(mode),
-              color: nightModeColor(mode),
-            ),
-            height: 40.0,
-            onChanged: (mode) {
-              ref.read(nightModeProvider.notifier).set(mode);
-            },
-          ),
-          onTap: () {
-            ref.read(nightModeProvider.notifier).next();
-          },
-        ),
         SwitchListTile(
           value: ref.watch(linksProvider),
           title: Text('Keeleõppija sõnavara'),
@@ -45,23 +25,6 @@ class EmptyWordView extends ConsumerWidget {
             ref.read(linksProvider.notifier).toggle();
           },
         ),
-        if (history.history.length > 3)
-          GestureDetector(
-            child: Container(
-              padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 5.0),
-              color: isDark ?  Color(0xff1f2c33) : Color(0xffccd9e0),
-              child: Text(
-                'Ava sõnaveebi veebileht',
-                style: TextStyle(
-                  color: isDark ? Colors.blue.shade200 : Colors.blue.shade800,
-                  fontSize: 18,
-                ),
-              ),
-            ),
-            onTap: () {
-              launchUrl(Uri.https('sonaveeb.ee'));
-            },
-          ),
         if (history.history.length <= 3)
           Padding(
             padding: const EdgeInsets.all(16.0),
@@ -124,7 +87,10 @@ class EmptyWordView extends ConsumerWidget {
                   subtitle: Text('👁 ${entry.views} 🕑 $day $hour'),
                   onTap: () {
                     Navigator.of(context).push(MaterialPageRoute(
-                      builder: (_) => WordPage(word: entry.wordRef),
+                      builder: (_) => WordPage(
+                        word: entry.wordRef,
+                        updateHistory: false,
+                      ),
                     ));
                   },
                 );
