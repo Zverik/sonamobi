@@ -92,6 +92,7 @@ class _WordPageState extends ConsumerState<WordPage>
     return Scaffold(
       appBar: AppBar(
         title: appBarTitle,
+        automaticallyImplyLeading: false,
         actions: [
           if (_searching)
             IconButton(

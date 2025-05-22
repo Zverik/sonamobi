@@ -50,6 +50,7 @@ class WordAppBarTitle extends ConsumerWidget {
           ),
         Text(
           homonym?.name ?? word.word,
+          overflow: TextOverflow.fade,
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
         if (flag.isNotEmpty)
