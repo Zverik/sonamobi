@@ -4,7 +4,7 @@ import 'package:sonamobi/log.dart';
 
 class WordSearchBar extends ConsumerStatefulWidget {
   final Function(String) onUpdateWord;
-  
+
   const WordSearchBar({super.key, required this.onUpdateWord});
 
   @override
@@ -56,6 +56,13 @@ class _WordSearchBarState extends ConsumerState<WordSearchBar>
   Widget build(BuildContext context) {
     return Row(
       children: [
+        if (Navigator.of(context).canPop())
+          IconButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            icon: Icon(Icons.arrow_back),
+          ),
         Expanded(
           child: Container(
             // color: Theme.of(context).primaryColor,

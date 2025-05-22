@@ -22,7 +22,7 @@ class HistoryController extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<List<HistoryEntry>> fetchHistory([int limit = 50]) async {
+  Future<List<HistoryEntry>> fetchHistory([int limit = 70]) async {
     final db = await _ref.read(databaseProvider).database;
     final rows = await db.query(
       HistoryEntry.kTableName,

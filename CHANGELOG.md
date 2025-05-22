@@ -1,5 +1,11 @@
 # Sõnamobi Changelog
 
+## 1.1
+
+- Reinstantiated the "back" button in the bottom panel.
+- Added reloading button to some error messages.
+- Wrapping long autocomplete results.
+
 ## 1.0 (2025-04-17)
 
 - Sõnaveeb has updated its pages, breaking the app.

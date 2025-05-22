@@ -46,7 +46,16 @@ class _TranslationPageState extends ConsumerState<TranslationPage> {
   Widget build(BuildContext context) {
     Widget panel;
     if (error != null) {
-      panel = MessagePanel(error, isError: true);
+      panel = MessagePanel(
+        error,
+        isError: true,
+        onReload: () {
+          setState(() {
+            error = null;
+          });
+          updateTranslation();
+        },
+      );
     } else {
       final textStyle = TextStyle(
         fontSize: 24,

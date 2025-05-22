@@ -83,13 +83,15 @@ class AutocompleteView extends StatelessWidget {
                     margin: EdgeInsets.only(right: 12.0),
                     child: Text('VORM', style: GoogleFonts.ptSansNarrow()),
                   ),
-                Text(
-                  item.word,
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: index == 0 && found.isSearchFound
-                        ? FontWeight.bold
-                        : FontWeight.normal,
+                Flexible(
+                  child: Text(
+                    item.word,
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: index == 0 && found.isSearchFound
+                          ? FontWeight.bold
+                          : FontWeight.normal,
+                    ),
                   ),
                 ),
               ],

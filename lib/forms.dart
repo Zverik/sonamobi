@@ -75,7 +75,7 @@ class _WordFormsPageState extends ConsumerState<WordFormsPage> {
             Expanded(
                 child: error == null
                     ? WebViewWidget(controller: _webController)
-                    : MessagePanel(error, isError: true)),
+                    : MessagePanel(error, isError: true, onReload: _loadPage)),
             SulgeButton(),
           ],
         ),

@@ -80,6 +80,11 @@ class _WordViewState extends ConsumerState<WordView> {
     if (idx < count) _changeHomonym(idx, homonyms.valueOrNull![idx]);
   }
 
+  void reload() {
+    _error = null;
+    ref.invalidate(homonymsProvider(widget.word));
+  }
+
   @override
   Widget build(BuildContext context) {
     final homonyms = ref.watch(homonymsProvider(widget.word));
@@ -98,15 +103,27 @@ class _WordViewState extends ConsumerState<WordView> {
     }
 
     if (homonyms.hasError) {
-      return MessagePanel(homonyms.error.toString(), isError: true);
+      return MessagePanel(
+        homonyms.error.toString(),
+        isError: true,
+        onReload: reload,
+      );
     }
 
     if (_error != null) {
-      return MessagePanel(_error ?? 'viga', isError: true);
+      return MessagePanel(
+        _error ?? 'viga',
+        isError: true,
+        onReload: reload,
+      );
     }
 
     if (homonyms.value?.isEmpty ?? true) {
-      return MessagePanel('Pole homonüüme', isError: true);
+      return MessagePanel(
+        'Pole homonüüme',
+        isError: true,
+        onReload: reload,
+      );
     }
 
     return PageView.builder(
