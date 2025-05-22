@@ -2,7 +2,7 @@
 
 ## 1.1
 
-- Reinstantiated the "back" button in the bottom panel.
+- Moved the "back" button from the title back to the bottom panel.
 - Added reloading button to some error messages.
 - Wrapping long autocomplete results.
 
