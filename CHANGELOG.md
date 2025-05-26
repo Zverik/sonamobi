@@ -1,6 +1,6 @@
 # Sõnamobi Changelog
 
-## 1.1
+## 1.1 (2025-05-26)
 
 - Moved the "back" button from the title back to the bottom panel.
 - Added reloading button to some error messages.
