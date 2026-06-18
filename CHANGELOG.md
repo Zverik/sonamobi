@@ -1,5 +1,9 @@
 # Sõnamobi Changelog
 
+## 1.2 (2026-06-18)
+
+- Sõnaveeb has updated its pages, breaking the app.
+
 ## 1.1 (2025-05-26)
 
 - Moved the "back" button from the title back to the bottom panel.

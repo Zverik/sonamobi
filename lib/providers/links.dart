@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:sonamobi/util/parsers.dart';
 
 final linksProvider =
     StateNotifierProvider<LinksNotifier, bool>((_) => LinksNotifier());
@@ -33,6 +34,8 @@ class LinksNotifier extends StateNotifier<bool> {
   String search(String word) =>
       isLite ? '/search/lite/dlall/$word' : '/search/unif/dlall/dsall/$word';
   String wordDetails(int wordId) => '/worddetails/$_dict/$wordId';
+  String homonym(Homonym homonym) =>
+      isLite ? '/search/lite/dlall/${homonym.urlTail}' : '/search/unif/dlall/dsall/${homonym.urlTail}';
   String morpho(int formId, String language) => '/morpho/$_dict/$formId/$language';
   RegExp get searchRegExp => isLite ? kReLite : kReUnif;
 

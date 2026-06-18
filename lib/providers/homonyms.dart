@@ -73,7 +73,7 @@ final homonymPageProvider = FutureProvider.autoDispose
   try {
     content = await ref
         .read(pageProvider)
-        .fetchPage(ref.read(linksProvider.notifier).wordDetails(homonym.id));
+        .fetchPage(ref.read(linksProvider.notifier).homonym(homonym));
   } on FetchError catch (e) {
     final logger = Logger('HonomymPageProvider');
     logger.severe('Failed to request page', e);

@@ -3,16 +3,16 @@ import 'package:html/dom.dart' show Element;
 import 'package:logging/logging.dart';
 
 class Homonym {
-  final int id;
+  final int? id;
   final int? homonymId;
-  final String? name;
+  final String name;
   final String language;
   final String? matches;
   final String? intro;
   final String? url;
 
   const Homonym({
-    required this.id,
+    this.id,
     required this.name,
     required this.language,
     this.homonymId,
@@ -20,6 +20,9 @@ class Homonym {
     this.intro,
     this.url,
   });
+
+  String get urlTail =>
+      homonymId == null ? '$name/$language' : '$name/$homonymId/$language';
 
   @override
   String toString() {
@@ -30,11 +33,12 @@ class Homonym {
   bool operator ==(Object other) =>
       other is Homonym &&
       other.id == id &&
+      other.homonymId == homonymId &&
       other.name == name &&
       other.language == language;
 
   @override
-  int get hashCode => Object.hash(id, name, language);
+  int get hashCode => Object.hash(id, homonymId, name, language);
 }
 
 class WordForm {
@@ -75,19 +79,19 @@ class SonaveebParsers {
       String? lang;
       int? homonymId;
       String? url;
-      for (final inputElement in homonym.getElementsByTagName('input')) {
-        if (inputElement.attributes['name'] == 'word-id') {
-          wordId = int.tryParse(inputElement.attributes['value']!);
-        } else if (inputElement.attributes['name'] == 'word-select-url') {
-          url = inputElement.attributes['value'];
+      String? name;
+      for (final link in homonym.getElementsByClassName('homonym-item')) {
+        if (link.localName == 'a') {
+          url = link.attributes['href'];
           if (url != null) {
             url = Uri.decodeComponent(url);
           }
           final urlMatch =
-              RegExp(r'd?all/[^/]+/(\d+)/(\w+)$').firstMatch(url ?? '');
+              RegExp(r'd.all/([^/]+)/(\d+)/(\w+)$').firstMatch(url ?? '');
           if (urlMatch != null) {
-            homonymId = int.tryParse(urlMatch.group(1) ?? '');
-            lang = urlMatch.group(2);
+            name = urlMatch.group(1);
+            homonymId = int.tryParse(urlMatch.group(2) ?? '');
+            lang = urlMatch.group(3);
           }
         }
       }
@@ -95,12 +99,20 @@ class SonaveebParsers {
       final homonymBody =
           homonym.getElementsByClassName('homonym__body').firstOrNull;
 
-      final wordNameElement = homonymBody
-          ?.getElementsByClassName('text-body-two')
-          .firstOrNull
-          ?.getElementsByTagName('span')
-          .firstOrNull;
-      String? name = wordNameElement?.text;
+      if (name == null) {
+        final wordNameElement = homonymBody
+            ?.getElementsByClassName('text-body-two')
+            .firstOrNull
+            ?.getElementsByTagName('span')
+            .firstOrNull;
+        name = wordNameElement?.text;
+      }
+
+      if (homonymId == null) {
+        final homonymNr =
+            homonymBody?.getElementsByClassName('homonym-nr').firstOrNull?.text;
+        if (homonymNr != null) homonymId = int.tryParse(homonymNr);
+      }
 
       if (lang == null) {
         final langElement = homonym.getElementsByClassName('lang-code');
@@ -118,7 +130,7 @@ class SonaveebParsers {
           .firstOrNull;
       String? intro = introElement?.text;
 
-      if (wordId != null && lang != null) {
+      if (name != null && lang != null) {
         homonyms.add(Homonym(
           id: wordId,
           homonymId: homonymId,
@@ -187,8 +199,10 @@ class SonaveebParsers {
       }
     }
 
+    String content = document.getElementById('word-details')?.outerHtml ?? body;
+
     return SearchPageData(
-      content: body,
+      content: content,
       forms: forms,
       formsRaw: formsRaw,
       morphId: paradigmId,

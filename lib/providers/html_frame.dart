@@ -182,7 +182,7 @@ eki-stress::after {
 }
 
 .lang-code {
-  display: inline-block;
+  display: inline-flex;
   flex: 0 0 auto;
   min-width: 24px;
   height: 20px;
@@ -195,6 +195,7 @@ eki-stress::after {
   text-align: center;
   cursor: default;
   background: %lang%;
+  border: none;
   border-radius: 4px;
 }
 
@@ -274,7 +275,9 @@ b, strong { font-weight: bolder; }
 .align-self-start { align-self: flex-start !important; }
 .align-items-end { align-items: flex-end !important; }
 .d-inline-flex { display: inline-flex !important; }
+.d-inline { display: inline !important; }
 .gap-2 { gap: 8px; }
+.display-inline-block { display: inline-block; }
 
 .w-100 { width: 100% !important; }
 .h-100 { height: 100% !important; }
@@ -429,7 +432,7 @@ th { text-align: inherit; }
 
 button.btn-ellipsis { border: none; }
 .text-caption {
-  font-size: 16px;
+  font-size: 14px;
   font-style: normal;
   font-weight: 400;
   line-height: normal;
